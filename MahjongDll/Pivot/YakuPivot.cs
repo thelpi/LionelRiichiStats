@@ -198,8 +198,7 @@ namespace MahjongDll.Pivot
                 FansConcealed = 2,
                 FansOpen = 2,
                 Name = Toitoi,
-                Description = "Pons (or kans) only.",
-                Upgrades = _yakus.Where(y => y.Name == Honroutou).ToList()
+                Description = "Pons (or kans) only."
             });
             _yakus.Add(new YakuPivot
             {
