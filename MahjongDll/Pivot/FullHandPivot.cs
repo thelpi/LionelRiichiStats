@@ -17,17 +17,9 @@ namespace MahjongDll.Pivot
         #region Embedded properties
 
         /// <summary>
-        /// List of 14 <see cref="TilePivot"/>.
+        /// List of concealed <see cref="TilePivot"/>.
         /// </summary>
-        public IReadOnlyCollection<TilePivot> Tiles { get; private set; }
-        /// <summary>
-        /// Indicates than the hand, without further context, is closed.
-        /// </summary>
-        public bool ForceConcealed { get; private set; }
-        /// <summary>
-        /// Indicates than the hand, if looks like pinfu without further context, is pinfu.
-        /// </summary>
-        public bool ForcePinfu { get; private set; }
+        public IReadOnlyCollection<TilePivot> ConcealedTiles { get; private set; }
         /// <summary>
         /// Dominant <see cref="WindPivot"/>.
         /// </summary>
@@ -36,46 +28,172 @@ namespace MahjongDll.Pivot
         /// Turn <see cref="WindPivot"/> for the player of the hand.
         /// </summary>
         public WindPivot TurnWind { get; private set; }
+        /// <summary>
+        /// List of opened <see cref="SetPivot"/>.
+        /// </summary>
+        public IReadOnlyCollection<SetPivot> OpenedSets { get; private set; }
+        /// <summary>
+        /// Last <see cref="TilePivot"/> picked. Not included in <see cref="ConcealedTiles"/>.
+        /// </summary>
+        public TilePivot LastTile { get; private set; }
+        /// <summary>
+        /// Closed kans.
+        /// </summary>
+        public IReadOnlyCollection<SetPivot> ConcealedKans { get; private set; }
+        /// <summary>
+        /// Indicates if the context is riichi.
+        /// </summary>
+        public bool IsRiichi { get; private set; }
+        /// <summary>
+        /// Indicates if the context is riichi at first turn.
+        /// </summary>
+        public bool IsDoubleRiichi { get; private set; }
+        /// <summary>
+        /// Indicates if the context is an ippatsu win.
+        /// </summary>
+        public bool IsIppatsu { get; private set; }
+        /// <summary>
+        /// Indicates if the context is a chankan win.
+        /// </summary>
+        public bool IsChankan { get; private set; }
+        /// <summary>
+        /// Indicates if the context is a haitei win.
+        /// </summary>
+        public bool IsHaitei { get; private set; }
+        /// <summary>
+        /// Indicates if the context is a rinshankaihou win.
+        /// </summary>
+        public bool IsRinshankaihou { get; private set; }
+        /// <summary>
+        /// Indicates if the context is a first draw win.
+        /// </summary>
+        public bool IsInitialDraw { get; private set; }
+        /// <summary>
+        /// Indicates if the context is a ron win.
+        /// </summary>
+        public bool IsRon { get; private set; }
 
         #endregion Embedded properties
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="tiles">List of tiles.</param>
-        /// <param name="dominantWind">Dominant <see cref="WindPivot"/>.</param>
-        /// <param name="turnWind">Turn <see cref="WindPivot"/> for the player of the hand.</param>
-        /// <param name="forceConcealed">Indicates than the hand, without further context, is closed.</param>
-        /// <param name="forcePinfu">Indicates than the hand, if looks like pinfu without further context, is pinfu.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="tiles"/> is <c>Null</c>.</exception>
+        /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
+        /// <param name="dominantWind"><see cref="DominantWind"/>.</param>
+        /// <param name="turnWind"><see cref="TurnWind"/>.</param>
+        /// <param name="lastTile"><see cref="LastTile"/>.</param>
+        /// <param name="isRon">Optionnal ; <see cref="IsRon"/>.</param>
+        /// <param name="openedSets">Optionnal ; <see cref="OpenedSets"/>.</param>
+        /// <param name="concealedKans">Optionnal ; <see cref="ConcealedKans"/>.</param>
+        /// <param name="isRiichi">Optionnal ; <see cref="IsRiichi"/>.</param>
+        /// <param name="isDoubleRiichi">Optionnal ; <see cref="IsDoubleRiichi"/>.</param>
+        /// <param name="isIppatsu">Optionnal ; <see cref="IsIppatsu"/>.</param>
+        /// <param name="isHaitei">Optionnal ; <see cref="IsHaitei"/>.</param>
+        /// <param name="isRinshankaihou">Optionnal ; <see cref="IsRinshankaihou"/>.</param>
+        /// <param name="isChankan">Optionnal ; <see cref="IsChankan"/>.</param>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
-        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot turnWind,
-            bool forceConcealed = false, bool forcePinfu = false)
+        /// <exception cref="ArgumentException"><see cref="Messages.InvalidHandArgumentsConsistencyError"/>.</exception>
+        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot turnWind, TilePivot lastTile, bool isRon = false,
+            List<SetPivot> openedSets = null, List<SetPivot> concealedKans = null,
+            bool isRiichi = false, bool isDoubleRiichi = false, bool isIppatsu = false, bool isHaitei = false,
+            bool isRinshankaihou = false, bool isChankan = false)
         {
-            if (tiles == null)
+            if (lastTile == null)
             {
-                throw new ArgumentNullException(nameof(tiles));
+                throw new ArgumentNullException(nameof(lastTile));
             }
+
+            tiles = tiles ?? new List<TilePivot>();
+            openedSets = openedSets ?? new List<SetPivot>();
+            concealedKans = concealedKans ?? new List<SetPivot>();
+
+            if ((openedSets.Count * 3 + concealedKans.Count * 3 + 1 + tiles.Count) != 14)
+            {
+                throw new ArgumentException(Messages.InvalidTilesCountInHandError);
+            }
+
+            if (isRon && isRinshankaihou)
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isRon));
+            }
+
+            if (openedSets.Count > 0 && (isRiichi || isDoubleRiichi || isIppatsu || openedSets.Any(set => set.IsPair)))
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(openedSets));
+            }
+
+            if (concealedKans.Count > 0 && concealedKans.Any(set => !set.IsKan))
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(concealedKans));
+            }
+
+            if (isRiichi && isDoubleRiichi)
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isRiichi));
+            }
+
+            // TODO : checks this rule.
+            if (isIppatsu && (isRinshankaihou || isChankan))
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isIppatsu));
+            }
+
+            // TODO : checks this rule.
+            // TODO : checks isChankan.
+            if (isHaitei && isRinshankaihou)
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isHaitei));
+            }
+
+            if (isRinshankaihou && isChankan)
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isRinshankaihou));
+            }
+
+            ConcealedTiles = tiles.OrderBy(t => t).ToList();
+            DominantWind = dominantWind;
+            TurnWind = turnWind;
+            LastTile = lastTile;
+            IsRon = isRon;
+            OpenedSets = openedSets;
+            ConcealedKans = concealedKans;
+            IsRiichi = isRiichi;
+            IsIppatsu = isIppatsu;
+            IsDoubleRiichi = isDoubleRiichi;
+            IsChankan = isChankan;
+            IsHaitei = isHaitei;
+            IsRinshankaihou = isRinshankaihou;
+        }
+
+        /// <summary>
+        /// Constructor specific to tenhou / chiihou.
+        /// </summary>
+        /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
+        /// <param name="turnWind"><see cref="TurnWind"/>.</param>
+        /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
+        public FullHandPivot(List<TilePivot> tiles, WindPivot turnWind)
+        {
+            tiles = tiles ?? new List<TilePivot>();
 
             if (tiles.Count != 14)
             {
-                throw new ArgumentException(Messages.InvalidTilesCountInHandError, nameof(tiles));
+                throw new ArgumentException(Messages.InvalidTilesCountInHandError);
             }
 
-            tiles.Sort();
-            Tiles = tiles;
-
-            DominantWind = dominantWind;
+            ConcealedTiles = tiles.OrderBy(t => t).ToList();
+            DominantWind = turnWind; // whatever
             TurnWind = turnWind;
-            ForceConcealed = forceConcealed;
-            ForcePinfu = forcePinfu;
+            OpenedSets = new List<SetPivot>();
+            ConcealedKans = new List<SetPivot>();
+            IsInitialDraw = true;
         }
 
         /// <summary>
         /// Computes the list of <see cref="YakuPivot"/> which can be made with this hand.
         /// </summary>
+        /// <param name="getFlat">If <c>True</c>, every yakus are returned regardless of upgrades and incompatibilities.</param>
         /// <returns>List of <see cref="YakuPivot"/>.</returns>
-        public List<YakuPivot> ComputeHandYakus()
+        public List<YakuPivot> ComputeHandYakus(bool getFlat)
         {
             List<YakuPivot> yakus = new List<YakuPivot>();
 
@@ -98,7 +216,7 @@ namespace MahjongDll.Pivot
                 {
                     foreach (List<SetPivot> currentCombo in combinationlist)
                     {
-                        foreach (YakuPivot yakuToCheck in YakuPivot.Yakus)
+                        foreach (YakuPivot yakuToCheck in YakuPivot.Yakus.OrderByDescending(c => c.FansConcealed))
                         {
                             bool isIn = false;
                             // For yakuhai only.
@@ -140,11 +258,11 @@ namespace MahjongDll.Pivot
                                     isIn = currentCombo.All(c => c.IsTerminal || c.IsTerminalChi);
                                     break;
                                 case YakuPivot.MenzenTsumo:
-                                    isIn = ForceConcealed;
+                                    isIn = !IsRon && OpenedSets.Count == 0;
                                     break;
                                 case YakuPivot.Pinfu:
-                                    isIn = ForcePinfu && currentCombo.All(c =>
-                                        c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != TurnWind && c.Wind != DominantWind));
+                                    isIn = currentCombo.All(c => c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != TurnWind && c.Wind != DominantWind))
+                                        && currentCombo.Any(c => c.IsChi && (c.Tiles.ElementAt(0).Equals(LastTile) || c.Tiles.ElementAt(2).Equals(LastTile)));
                                     break;
                                 case YakuPivot.Ryanpeikou:
                                     isIn = currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Count(c => c.Count() >= 2) > 1
@@ -196,23 +314,30 @@ namespace MahjongDll.Pivot
                                         c.IsPonOrKan && (c.IsDragon || c.Wind == TurnWind || c.Wind == DominantWind));
                                     isIn = yakuCumul > 0;
                                     break;
-                                    // Circumstantial yakus.
-                                    /*case YakuPivot.Chankan:
-                                        break;
-                                    case YakuPivot.Chiihou:
-                                        break;
-                                    case YakuPivot.DoubleRiichi:
-                                        break;
-                                    case YakuPivot.Haitei:
-                                        break;
-                                    case YakuPivot.Ippatsu:
-                                        break;
-                                    case YakuPivot.Riichi:
-                                        break;
-                                    case YakuPivot.RinshanKaihou:
-                                        break;
-                                    case YakuPivot.Tenhou:
-                                        break;*/
+                                case YakuPivot.Chankan:
+                                    isIn = IsChankan;
+                                    break;
+                                case YakuPivot.Chiihou:
+                                    isIn = IsInitialDraw && TurnWind != WindPivot.east;
+                                    break;
+                                case YakuPivot.DoubleRiichi:
+                                    isIn = IsDoubleRiichi;
+                                    break;
+                                case YakuPivot.Haitei:
+                                    isIn = IsHaitei;
+                                    break;
+                                case YakuPivot.Ippatsu:
+                                    isIn = IsIppatsu;
+                                    break;
+                                case YakuPivot.Riichi:
+                                    isIn = IsRiichi && !IsDoubleRiichi;
+                                    break;
+                                case YakuPivot.RinshanKaihou:
+                                    isIn = IsRinshankaihou;
+                                    break;
+                                case YakuPivot.Tenhou:
+                                    isIn = IsInitialDraw && TurnWind == WindPivot.east;
+                                    break;
                             }
                             if (isIn)
                             {
@@ -256,14 +381,14 @@ namespace MahjongDll.Pivot
         // Checks if the hand is Kokushi Musou.
         private bool IsKokushiMusou()
         {
-            return Tiles.All(t => t.IsTerminalOrHonor)
+            return ConcealedTiles.All(t => t.IsTerminalOrHonor)
                 // Doesn't contain a pon.
-                && !Tiles
+                && !ConcealedTiles
                     .GroupBy(t => t)
                     .Select(grp => new KeyValuePair<TilePivot, int>(grp.Key, grp.Count()))
                     .Any(kvp => kvp.Value > 2)
                 // Contains a single pair.
-                && Tiles
+                && ConcealedTiles
                     .GroupBy(t => t)
                     .Select(grp => new KeyValuePair<TilePivot, int>(grp.Key, grp.Count()))
                     .Count(kvp => kvp.Value == 2) == 1;
@@ -274,13 +399,13 @@ namespace MahjongDll.Pivot
         {
             List<SetPivot> sets = new List<SetPivot>();
             List<TilePivot> passed = new List<TilePivot>();
-            for (int i = 0; i < Tiles.Count; i++)
+            for (int i = 0; i < ConcealedTiles.Count; i++)
             {
-                if (i % 2 == 1 && Tiles.ElementAt(i).Equals(Tiles.ElementAt(i - 1))
-                    && !passed.Contains(Tiles.ElementAt(i)))
+                if (i % 2 == 1 && ConcealedTiles.ElementAt(i).Equals(ConcealedTiles.ElementAt(i - 1))
+                    && !passed.Contains(ConcealedTiles.ElementAt(i)))
                 {
-                    sets.Add(new SetPivot(Tiles.ElementAt(i - 1), Tiles.ElementAt(i)));
-                    passed.Add(Tiles.ElementAt(i - 1));
+                    sets.Add(new SetPivot(ConcealedTiles.ElementAt(i - 1), ConcealedTiles.ElementAt(i)));
+                    passed.Add(ConcealedTiles.ElementAt(i - 1));
                 }
             }
             return sets;
@@ -292,7 +417,7 @@ namespace MahjongDll.Pivot
             List<List<SetPivot>> listOf_FourthSetsAndAPair = new List<List<SetPivot>>();
 
             // Treats each family of tiles (dragon, wind, bamboo...) and begins with dragons and winds (do not change the OrderBy).
-            foreach (var family in Tiles.GroupBy(t => t.Family).OrderByDescending(t => (int)t.Key))
+            foreach (var family in ConcealedTiles.GroupBy(t => t.Family).OrderByDescending(t => (int)t.Key))
             {
                 switch (family.Key)
                 {
@@ -401,8 +526,10 @@ namespace MahjongDll.Pivot
         {
             if (k == 0)
             {
-                var result = new HashSet<HashSet<List<int>>>();
-                result.Add(new HashSet<List<int>>());
+                var result = new HashSet<HashSet<List<int>>>
+                {
+                    new HashSet<List<int>>()
+                };
                 if (globals[0] == null)
                 {
                     globals[0] = result;
@@ -416,7 +543,7 @@ namespace MahjongDll.Pivot
                 {
                     var newAlphabet = new HashSet<List<int>>(alphabet);
                     newAlphabet.Remove(e);
-                    var smallerCombinations = globals[k - 1] != null ? globals[k - 1] : Combinations(newAlphabet, k - 1, globals);
+                    var smallerCombinations = globals[k - 1] ?? Combinations(newAlphabet, k - 1, globals);
                     var useFullCombination = smallerCombinations.Where(sets => !sets.SelectMany(x => x).Any(x => e.Contains(x))).ToList();
                     foreach (var smallerCombination in useFullCombination)
                     {

@@ -61,6 +61,15 @@ namespace MahjongDll {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The value of the argument breaks a consistency rule when combined with other arguments..
+        /// </summary>
+        internal static string InvalidHandArgumentsConsistencyError {
+            get {
+                return ResourceManager.GetString("InvalidHandArgumentsConsistencyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The family can&apos;t be dragon or wind in this context..
         /// </summary>
         internal static string InvalidTileFamilyError {

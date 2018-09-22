@@ -18,7 +18,6 @@ namespace MahjongTestUnit
             {
                 new TilePivot(DragonPivot.red),
                 new TilePivot(DragonPivot.red),
-                new TilePivot(DragonPivot.red),
                 new TilePivot(FamilyPivot.bamboo, 4),
                 new TilePivot(FamilyPivot.bamboo, 5),
                 new TilePivot(FamilyPivot.bamboo, 6),
@@ -33,9 +32,9 @@ namespace MahjongTestUnit
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east, new TilePivot(DragonPivot.red));
 
-            List<YakuPivot> yakus = handPivot.ComputeHandYakus();
+            List<YakuPivot> yakus = handPivot.ComputeHandYakus(true);
 
             Assert.IsNotNull(yakus);
             Assert.IsTrue(yakus.Contains(YakuPivot.Get(YakuPivot.Yakuhai)));
@@ -58,14 +57,13 @@ namespace MahjongTestUnit
                 new TilePivot(FamilyPivot.bamboo, 8),
                 new TilePivot(FamilyPivot.circle, 5),
                 new TilePivot(FamilyPivot.circle, 5),
-                new TilePivot(FamilyPivot.circle, 8),
                 new TilePivot(FamilyPivot.circle, 8)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east, true);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east, new TilePivot(FamilyPivot.circle, 8));
 
-            List<YakuPivot> yakus = handPivot.ComputeHandYakus();
+            List<YakuPivot> yakus = handPivot.ComputeHandYakus(true);
 
             Assert.IsNotNull(yakus);
             Assert.IsTrue(yakus.Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
@@ -83,7 +81,6 @@ namespace MahjongTestUnit
                 new TilePivot(DragonPivot.green),
                 new TilePivot(DragonPivot.red),
                 new TilePivot(DragonPivot.red),
-                new TilePivot(DragonPivot.red),
                 new TilePivot(WindPivot.east),
                 new TilePivot(WindPivot.east),
                 new TilePivot(WindPivot.east),
@@ -95,9 +92,9 @@ namespace MahjongTestUnit
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north, new TilePivot(DragonPivot.red));
 
-            List<YakuPivot> yakus = handPivot.ComputeHandYakus();
+            List<YakuPivot> yakus = handPivot.ComputeHandYakus(true);
 
             Assert.IsNotNull(yakus);
             Assert.AreEqual(4, yakus.Count(y => y.Name == YakuPivot.Yakuhai));
@@ -117,7 +114,6 @@ namespace MahjongTestUnit
             List<TilePivot> tiles = new List<TilePivot>
             {
                 new TilePivot(FamilyPivot.character, 1),
-                new TilePivot(FamilyPivot.character, 1),
                 new TilePivot(FamilyPivot.character, 2),
                 new TilePivot(FamilyPivot.character, 2),
                 new TilePivot(FamilyPivot.character, 3),
@@ -133,9 +129,9 @@ namespace MahjongTestUnit
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north, forcePinfu: true);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north, new TilePivot(FamilyPivot.character, 1));
 
-            List<YakuPivot> yakus = handPivot.ComputeHandYakus();
+            List<YakuPivot> yakus = handPivot.ComputeHandYakus(true);
 
             Assert.IsNotNull(yakus);
             Assert.IsTrue(yakus.Contains(YakuPivot.Get(YakuPivot.Chinitsu)));
