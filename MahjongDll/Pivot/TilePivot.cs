@@ -5,8 +5,8 @@ namespace MahjongDll.Pivot
     /// <summary>
     /// Represents a tile.
     /// </summary>
-    /// <seealso cref="IComparable"/>.
-    /// <seealso cref="IEquatable"/>.
+    /// <seealso cref="IComparable{T}"/>.
+    /// <seealso cref="IEquatable{T}"/>.
     public class TilePivot : IComparable<TilePivot>, IEquatable<TilePivot>
     {
         #region Embedded properties

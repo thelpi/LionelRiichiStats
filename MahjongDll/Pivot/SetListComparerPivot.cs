@@ -6,7 +6,7 @@ namespace MahjongDll.Pivot
     /// <summary>
     /// Compares two list of <see cref="SetPivot"/>.
     /// </summary>
-    /// <seealso cref="IEqualityComparer"/>.
+    /// <seealso cref="IEqualityComparer{T}"/>.
     public class SetListComparerPivot : IEqualityComparer<List<SetPivot>>
     {
         /// <summary>

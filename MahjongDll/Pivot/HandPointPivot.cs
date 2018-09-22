@@ -136,7 +136,7 @@ namespace MahjongDll.Pivot
         /// </summary>
         /// <param name="yakus">List of yakus. Must be checked for errors by the caller.</param>
         /// <exception cref="ArgumentNullException"><paramref name="yakus"/> is <c>Null</c>.</exception>
-        /// <exception cref=ArgumentException""><see cref="Messages.InvalidYakusListError"/></exception>
+        /// <exception cref="ArgumentException"><see cref="Messages.InvalidYakusListError"/></exception>
         public HandPointPivot(List<YakuPivot> yakus)
         {
             if (yakus == null)

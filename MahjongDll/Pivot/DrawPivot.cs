@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MahjongDll.Pivot
 {
-    public class DrawPivot
+    /*public class DrawPivot
     {
         private List<TilePivot> _tiles = new List<TilePivot>();
         private Random _randomizer = new Random(DateTime.Now.Millisecond);
@@ -31,5 +29,5 @@ namespace MahjongDll.Pivot
             }
             _tiles = _tiles.OrderBy(x => _randomizer.NextDouble()).ToList();
         }
-    }
+    }*/
 }
