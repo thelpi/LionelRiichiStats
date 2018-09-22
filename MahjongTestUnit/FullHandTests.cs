@@ -12,12 +12,14 @@ namespace MahjongTestUnit
         private Random _randomizer = new Random(DateTime.Now.Millisecond);
 
         [TestMethod]
-        public void TestBasicValidHand()
+        public void Test_DoubleYakuPai_Open()
         {
+            SetPivot openedSets = new SetPivot(new TilePivot(WindPivot.east),
+                new TilePivot(WindPivot.east),
+                new TilePivot(WindPivot.east));
+
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(DragonPivot.red),
-                new TilePivot(DragonPivot.red),
                 new TilePivot(FamilyPivot.bamboo, 4),
                 new TilePivot(FamilyPivot.bamboo, 5),
                 new TilePivot(FamilyPivot.bamboo, 6),
@@ -27,17 +29,21 @@ namespace MahjongTestUnit
                 new TilePivot(FamilyPivot.circle, 3),
                 new TilePivot(FamilyPivot.circle, 3),
                 new TilePivot(FamilyPivot.circle, 1),
-                new TilePivot(FamilyPivot.circle, 2),
-                new TilePivot(FamilyPivot.circle, 3)
+                new TilePivot(FamilyPivot.circle, 2)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east, new TilePivot(DragonPivot.red));
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east,
+                new TilePivot(FamilyPivot.circle, 3),
+                openedSets: new List<SetPivot> { openedSets });
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
-            // Assert.IsTrue(yakus.Contains(YakuPivot.Get(YakuPivot.Yakuhai)));
+            Assert.AreEqual(1, groupsOfYakus.Count);
+            Assert.IsNotNull(groupsOfYakus[0]);
+            Assert.AreEqual(2, groupsOfYakus[0].Count);
+            Assert.IsTrue(groupsOfYakus[0].All(y => y.Name == YakuPivot.Yakuhai));
         }
 
         [TestMethod]

@@ -27,6 +27,10 @@ namespace MahjongDll.Pivot
         /// </summary>
         /// <remarks>0 when the yaku can't be made opened.</remarks>
         public int FansOpen { get; private set; }
+        /// <summary>
+        /// List of similar <see cref="YakuPivot"/> with more restrictive rules.
+        /// </summary>
+        public IReadOnlyCollection<YakuPivot> Upgrades { get; private set; } = new List<YakuPivot>();
 
         #endregion
 
@@ -73,8 +77,8 @@ namespace MahjongDll.Pivot
             {
                 FansConcealed = 1,
                 FansOpen = 0,
-                Name = Riichi,
-                Description = "Declaration of tenpai (hand must be closed and becomes immutable)."
+                Name = MenzenTsumo,
+                Description = "All tiles concealed."
             });
             _yakus.Add(new YakuPivot
             {
@@ -87,22 +91,8 @@ namespace MahjongDll.Pivot
             {
                 FansConcealed = 1,
                 FansOpen = 0,
-                Name = MenzenTsumo,
-                Description = "All tiles concealed."
-            });
-            _yakus.Add(new YakuPivot
-            {
-                FansConcealed = 1,
-                FansOpen = 0,
                 Name = Pinfu,
                 Description = "Only Chis and one pair (hand must be closed, pair without value, wait on both sides)."
-            });
-            _yakus.Add(new YakuPivot
-            {
-                FansConcealed = 1,
-                FansOpen = 0,
-                Name = Iipeikou,
-                Description = "Twice the same chi (hand must be closed)."
             });
             _yakus.Add(new YakuPivot
             {
@@ -148,10 +138,11 @@ namespace MahjongDll.Pivot
             });
             _yakus.Add(new YakuPivot
             {
-                FansConcealed = 2,
-                FansOpen = 1,
-                Name = Chantaiyao,
-                Description = "Terminals or honors in each set."
+                FansConcealed = 1,
+                FansOpen = 0,
+                Name = Riichi,
+                Description = "Declaration of tenpai (hand must be closed and becomes immutable).",
+                Upgrades = _yakus.Where(y => y.Name == DoubleRiichi).ToList()
             });
             _yakus.Add(new YakuPivot
             {
@@ -166,13 +157,6 @@ namespace MahjongDll.Pivot
                 FansOpen = 2,
                 Name = Ittsuu,
                 Description = "123456789 in a single family."
-            });
-            _yakus.Add(new YakuPivot
-            {
-                FansConcealed = 2,
-                FansOpen = 2,
-                Name = Toitoi,
-                Description = "Pons (or kans) only."
             });
             _yakus.Add(new YakuPivot
             {
@@ -213,15 +197,16 @@ namespace MahjongDll.Pivot
             {
                 FansConcealed = 2,
                 FansOpen = 2,
-                Name = Shousangen,
-                Description = "Two pons or kans or dragons and a pair of dragons."
+                Name = Toitoi,
+                Description = "Pons (or kans) only.",
+                Upgrades = _yakus.Where(y => y.Name == Honroutou).ToList()
             });
             _yakus.Add(new YakuPivot
             {
-                FansConcealed = 3,
+                FansConcealed = 2,
                 FansOpen = 2,
-                Name = Honitsu,
-                Description = "A single family and honors."
+                Name = Shousangen,
+                Description = "Two pons or kans or dragons and a pair of dragons."
             });
             _yakus.Add(new YakuPivot
             {
@@ -232,6 +217,14 @@ namespace MahjongDll.Pivot
             });
             _yakus.Add(new YakuPivot
             {
+                FansConcealed = 2,
+                FansOpen = 1,
+                Name = Chantaiyao,
+                Description = "Terminals or honors in each set.",
+                Upgrades = _yakus.Where(y => y.Name == Junchantaiyao || y.Name == Honroutou).ToList()
+            });
+            _yakus.Add(new YakuPivot
+            {
                 FansConcealed = 3,
                 FansOpen = 0,
                 Name = Ryanpeikou,
@@ -239,10 +232,26 @@ namespace MahjongDll.Pivot
             });
             _yakus.Add(new YakuPivot
             {
+                FansConcealed = 1,
+                FansOpen = 0,
+                Name = Iipeikou,
+                Description = "Twice the same chi (hand must be closed).",
+                Upgrades = _yakus.Where(y => y.Name == Ryanpeikou).ToList()
+            });
+            _yakus.Add(new YakuPivot
+            {
                 FansConcealed = 6,
                 FansOpen = 5,
                 Name = Chinitsu,
                 Description = "A single family."
+            });
+            _yakus.Add(new YakuPivot
+            {
+                FansConcealed = 3,
+                FansOpen = 2,
+                Name = Honitsu,
+                Description = "A single family and honors.",
+                Upgrades = _yakus.Where(y => y.Name == Chinitsu).ToList()
             });
 
             // Yakumans below this line.

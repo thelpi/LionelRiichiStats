@@ -43,6 +43,7 @@ namespace MahjongDll.Pivot
         /// <summary>
         /// Indicates if the context is riichi.
         /// </summary>
+        /// <remarks><c>True</c> if <see cref="IsDoubleRiichi"/>.</remarks>
         public bool IsRiichi { get; private set; }
         /// <summary>
         /// Indicates if the context is riichi at first turn.
@@ -133,11 +134,6 @@ namespace MahjongDll.Pivot
                 throw new ArgumentException(Messages.InvalidTilesCountInHandError);
             }
 
-            if (isRon && isRinshankaihou)
-            {
-                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isRon));
-            }
-
             if (openedSets.Count > 0 && (isRiichi || isDoubleRiichi || isIppatsu || openedSets.Any(set => set.IsPair)))
             {
                 throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(openedSets));
@@ -148,27 +144,19 @@ namespace MahjongDll.Pivot
                 throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(concealedKans));
             }
 
-            if (isRiichi && isDoubleRiichi)
+            if (IsHaitei && isRinshankaihou)
             {
-                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isRiichi));
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(IsHaitei));
             }
 
-            // TODO : checks this rule.
-            if (isIppatsu && (isRinshankaihou || isChankan))
+            if (isChankan && (isRinshankaihou || !isRon))
+            {
+                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isChankan));
+            }
+
+            if (isIppatsu && (isRinshankaihou || (IsRon && isHaitei)))
             {
                 throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isIppatsu));
-            }
-
-            // TODO : checks this rule.
-            // TODO : checks isChankan.
-            if (isHaitei && isRinshankaihou)
-            {
-                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isHaitei));
-            }
-
-            if (isRinshankaihou && isChankan)
-            {
-                throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isRinshankaihou));
             }
 
             ConcealedTiles = tiles.OrderBy(t => t).ToList();
@@ -178,7 +166,7 @@ namespace MahjongDll.Pivot
             IsRon = isRon;
             OpenedSets = openedSets;
             ConcealedKans = concealedKans;
-            IsRiichi = isRiichi;
+            IsRiichi = isRiichi || isDoubleRiichi;
             IsIppatsu = isIppatsu;
             IsDoubleRiichi = isDoubleRiichi;
             IsChankan = isChankan;
@@ -246,104 +234,112 @@ namespace MahjongDll.Pivot
                             continue;
                         }
 
-                        bool isIn = false;
+                        bool validCombination = false;
                         // For yakuhai only.
                         int yakuCumul = 1;
                         switch (yakuToCheck.Name)
                         {
                             case YakuPivot.Chantaiyao:
-                                isIn = currentCombo.All(c => c.IsHonorOrTerminal || c.IsTerminalChi);
+                                validCombination = currentCombo.All(c => c.IsHonorOrTerminal || c.IsTerminalChi);
                                 break;
                             case YakuPivot.Chinitsu:
-                                isIn = currentCombo.All(c => !c.IsHonor && c.Family == currentCombo.First().Family);
+                                validCombination = currentCombo.All(c => !c.IsHonor && c.Family == currentCombo.First().Family);
                                 break;
                             case YakuPivot.Chinroutou:
-                                isIn = currentCombo.All(c => c.IsTerminal);
+                                validCombination = currentCombo.All(c => c.IsTerminal);
                                 break;
                             case YakuPivot.ChuurenPoutou:
-                                isIn = IsChuurenPoutou();
+                                validCombination = IsChuurenPoutou();
                                 break;
                             case YakuPivot.Daisangen:
-                                isIn = currentCombo.Count(c => c.IsPonOrKan && c.IsDragon) == 3;
+                                validCombination = currentCombo.Count(c => c.IsPonOrKan && c.IsDragon) == 3;
                                 break;
                             case YakuPivot.Daisuushi:
-                                isIn = currentCombo.Count(c => c.IsWind && c.IsPonOrKan) == 4;
+                                validCombination = currentCombo.Count(c => c.IsWind && c.IsPonOrKan) == 4;
                                 break;
                             case YakuPivot.Honitsu:
-                                isIn = currentCombo.All(c => c.IsHonor || (!c.IsHonor && c.Family == currentCombo.First(cBis => !cBis.IsHonor).Family));
+                                validCombination = currentCombo.All(c => c.IsHonor || (!c.IsHonor && c.Family == currentCombo.First(cBis => !cBis.IsHonor).Family));
                                 break;
                             case YakuPivot.Honroutou:
-                                isIn = currentCombo.All(c => c.IsHonorOrTerminal);
+                                validCombination = currentCombo.All(c => c.IsHonorOrTerminal);
                                 break;
                             case YakuPivot.Iipeikou:
-                                isIn = currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Any(c => c.Count() >= 2);
+                                validCombination = currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Any(c => c.Count() >= 2);
                                 break;
                             case YakuPivot.Ittsuu:
-                                isIn = currentCombo.Where(c => c.IsChi).GroupBy(c => c.Family).Any(c =>
+                                validCombination = currentCombo.Where(c => c.IsChi).GroupBy(c => c.Family).Any(c =>
                                     new int[] { 1, 4, 7 }.All(index => c.Any(set => set.FirstNumber == index)));
                                 break;
                             case YakuPivot.Junchantaiyao:
-                                isIn = currentCombo.All(c => c.IsTerminal || c.IsTerminalChi);
+                                validCombination = currentCombo.All(c => c.IsTerminal || c.IsTerminalChi);
                                 break;
                             case YakuPivot.Pinfu:
-                                isIn = currentCombo.All(c => c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != TurnWind && c.Wind != DominantWind))
+                                validCombination = currentCombo.All(c => c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != TurnWind && c.Wind != DominantWind))
                                     && currentCombo.Any(c => c.IsChi && (c.Tiles.ElementAt(0).Equals(LastTile) || c.Tiles.ElementAt(2).Equals(LastTile)));
                                 break;
                             case YakuPivot.Ryanpeikou:
-                                isIn = currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Count(c => c.Count() >= 2) > 1
+                                validCombination = currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Count(c => c.Count() >= 2) > 1
                                     || currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Any(c => c.Count() == 4);
                                 break;
                             case YakuPivot.Ryuuiisou:
-                                isIn = currentCombo.All(c => c.Dragon == DragonPivot.green
+                                validCombination = currentCombo.All(c => c.Dragon == DragonPivot.green
                                     || (c.Family == FamilyPivot.bamboo && c.Tiles.All(t => t.Number == 3 || t.Number % 2 == 0)));
                                 break;
                             case YakuPivot.Sanankou:
-                                isIn = currentCombo.Count(c => c.IsPonOrKan) >= 3;
+                                validCombination = currentCombo.Count(c => c.IsPonOrKan) >= 3;
                                 break;
                             case YakuPivot.Sankantsu:
-                                isIn = currentCombo.Count(c => c.IsKan) == 3;
+                                validCombination = currentCombo.Count(c => c.IsKan) == 3;
                                 break;
                             case YakuPivot.SanshokuDoujun:
-                                isIn = currentCombo.Where(c => c.IsChi).GroupBy(c => c.FirstNumber).Any(c => c.Count() >= 3
+                                validCombination = currentCombo.Where(c => c.IsChi).GroupBy(c => c.FirstNumber).Any(c => c.Count() >= 3
                                     && new FamilyPivot[] { FamilyPivot.bamboo, FamilyPivot.character, FamilyPivot.circle }.All(f =>
                                         c.Any(set => set.Family == f)));
                                 break;
                             case YakuPivot.SanshokuDoukou:
-                                isIn = currentCombo.Where(c => c.IsPonOrKan && !c.IsHonor).GroupBy(c => c.FirstNumber).Any(c => c.Count() == 3);
+                                validCombination = currentCombo.Where(c => c.IsPonOrKan && !c.IsHonor).GroupBy(c => c.FirstNumber).Any(c => c.Count() == 3);
                                 break;
                             case YakuPivot.Shousangen:
-                                isIn = currentCombo.Count(c => c.IsDragon && c.IsPonOrKan) == 2
+                                validCombination = currentCombo.Count(c => c.IsDragon && c.IsPonOrKan) == 2
                                     && currentCombo.Any(c => c.IsPair && c.IsDragon);
                                 break;
                             case YakuPivot.Shousuushi:
-                                isIn = currentCombo.Count(c => c.IsWind && c.IsPonOrKan) == 3
+                                validCombination = currentCombo.Count(c => c.IsWind && c.IsPonOrKan) == 3
                                     && currentCombo.Any(c => c.IsPair && c.IsWind);
                                 break;
                             case YakuPivot.Suuankou:
-                                isIn = currentCombo.Count(c => c.IsPonOrKan) == 4;
+                                validCombination = currentCombo.Count(c => c.IsPonOrKan) == 4;
                                 break;
                             case YakuPivot.Suukantsu:
-                                isIn = currentCombo.Count(c => c.IsKan) == 4;
+                                validCombination = currentCombo.Count(c => c.IsKan) == 4;
                                 break;
                             case YakuPivot.Tanyao:
-                                isIn = currentCombo.All(c => !c.IsHonorOrTerminal && !c.IsTerminalChi);
+                                validCombination = currentCombo.All(c => !c.IsHonorOrTerminal && !c.IsTerminalChi);
                                 break;
                             case YakuPivot.Toitoi:
-                                isIn = currentCombo.Count(c => c.IsPonOrKan) == 4;
+                                validCombination = currentCombo.Count(c => c.IsPonOrKan) == 4;
                                 break;
                             case YakuPivot.Tsuuiisou:
-                                isIn = currentCombo.All(c => c.IsHonor);
+                                validCombination = currentCombo.All(c => c.IsHonor);
                                 break;
                             case YakuPivot.Yakuhai:
-                                yakuCumul = currentCombo.Count(c =>
-                                    c.IsPonOrKan && (c.IsDragon || c.Wind == TurnWind || c.Wind == DominantWind));
-                                isIn = yakuCumul > 0;
+                                yakuCumul = currentCombo.Count(c => c.IsPonOrKan && c.IsDragon);
+                                yakuCumul += currentCombo.Count(c => c.IsPonOrKan && c.Wind == TurnWind);
+                                yakuCumul += currentCombo.Count(c => c.IsPonOrKan && c.Wind == DominantWind);
+                                validCombination = yakuCumul > 0;
                                 break;
                             case YakuPivot.Chiitoitsu:
-                                isIn = currentCombo.All(x => x.IsPair);
+                                validCombination = currentCombo.All(x => x.IsPair);
                                 break;
                         }
-                        if (isIn)
+                        // 1 - the combination is valid.
+                        // 2 - the combination is a yakuman or "yakusList" doesn't contain a yakuman.
+                        // 3 - there's no upgrade of the combination in "yakusList".
+                        // 4 - the hand is concealed or the yaku is valid when open.
+                        if (validCombination
+                            && (yakuToCheck.Yakuman || !yakusList.Any(y => y.Yakuman))
+                            && !yakusList.Any(y => yakuToCheck.Upgrades.Contains(y))
+                            && (!IsOpen || yakuToCheck.FansOpen > 0))
                         {
                             for (int i = 1; i <= yakuCumul; i++)
                             {
@@ -502,7 +498,7 @@ namespace MahjongDll.Pivot
             List<List<SetPivot>> listOf_FourthSetsAndAPair = new List<List<SetPivot>>();
 
             // Treats each family of tiles (dragon, wind, bamboo...) and begins with dragons and winds (do not change the OrderBy).
-            foreach (var family in ConcealedTiles.GroupBy(t => t.Family).OrderByDescending(t => (int)t.Key))
+            foreach (var family in UnsetTiles.GroupBy(t => t.Family).OrderByDescending(t => (int)t.Key))
             {
                 switch (family.Key)
                 {
@@ -576,6 +572,12 @@ namespace MahjongDll.Pivot
                 }
             }
             exitloop:
+
+            listOf_FourthSetsAndAPair.ForEach(sets =>
+            {
+                sets.AddRange(ConcealedKans);
+                sets.AddRange(OpenedSets);
+            });
 
             return listOf_FourthSetsAndAPair.Distinct(new SetListComparerPivot()).ToList();
         }
