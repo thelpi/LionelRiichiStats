@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace MahjongDll.Pivot
 {
+    /*
     /// <summary>
     /// Represents the points of a complete hand.
     /// </summary>
@@ -11,66 +12,20 @@ namespace MahjongDll.Pivot
     {
         #region Embedded properties
 
-        /// <summary>
-        /// List of yakus. Must be checked for errors by the caller.
-        /// </summary>
-        public IReadOnlyCollection<YakuPivot> Yakus { get; private set; }
-        /// <summary>
-        /// Indicates the current wind  of the winner.
-        /// </summary>
-        public WindPivot WinnerWind { get; private set; }
-        /// <summary>
-        /// Indicates the wind of the opponent which has got ron. <c>Null</c> for tsumo.
-        /// </summary>
-        public WindPivot? LoserWind { get; private set; }
-        /// <summary>
-        /// Indicates if the hand is open.
-        /// </summary>
-        public bool IsOpen { get; private set; }
-        /// <summary>
-        /// Number of doras (any type).
-        /// </summary>
-        public int Doras { get; private set; }
-        /// <summary>
-        /// Indicates if the hand contains a pair of dragons or winds (dominant or turn).
-        /// </summary>
-        public bool HasPairOfHonnor { get; private set; }
-        /// <summary>
-        /// Indicates if the hand has been complete on a chi double wait.
-        /// </summary>
-        public bool FinishOnChiDoubleWait { get; private set; }
-        /// <summary>
-        /// Number of concealed pons (not honor either terminal).
-        /// </summary>
-        public int ConcealedRegularPons { get; private set; }
-        /// <summary>
-        /// Number of concealed kans (not honor either terminal).
-        /// </summary>
-        public int ConcealedRegularKans { get; private set; }
-        /// <summary>
-        /// Number of concealed pons (honor or terminal).
-        /// </summary>
-        public int ConcealedTerminalOrHonorPons { get; private set; }
-        /// <summary>
-        /// Number of concealed kans (honor or terminal).
-        /// </summary>
-        public int ConcealedTerminalOrHonorKans { get; private set; }
-        /// <summary>
-        /// Number of opened pons (not honor either terminal).
-        /// </summary>
-        public int OpenedRegularPons { get; private set; }
-        /// <summary>
-        /// Number of opened kans (not honor either terminal).
-        /// </summary>
-        public int OpenedRegularKans { get; private set; }
-        /// <summary>
-        /// Number of opened pons (honor or terminal).
-        /// </summary>
-        public int OpenedTerminalOrHonorPons { get; private set; }
-        /// <summary>
-        /// Number of opened kans (honor or terminal).
-        /// </summary>
-        public int OpenedTerminalOrHonorKans { get; private set; }
+        // The east hand.
+        private FullHandPivot _handEast;
+        // The south hand.
+        private FullHandPivot _handSouth;
+        // The west hand.
+        private FullHandPivot _handWest;
+        // The north hand.
+        private FullHandPivot _handNorth;
+        // List of dora indicators.
+        private List<TilePivot> _doraMarks;
+        // List of ura-dora indicators.
+        private List<TilePivot> _uradoraMarks;
+        // Indicates the wind of the player who gaves the ron (if ron).
+        private WindPivot? _ronOn;
 
         #endregion Embedded properties
 
@@ -132,24 +87,32 @@ namespace MahjongDll.Pivot
         #endregion
 
         /// <summary>
-        /// Constructor.
+        /// 
         /// </summary>
-        /// <param name="yakus">List of yakus. Must be checked for errors by the caller.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="yakus"/> is <c>Null</c>.</exception>
-        /// <exception cref="ArgumentException"><see cref="Messages.InvalidYakusListError"/></exception>
-        public HandPointPivot(List<YakuPivot> yakus)
+        /// <param name="eastHand"></param>
+        /// <param name="southHand"></param>
+        /// <param name="westHand"></param>
+        /// <param name="northHand"></param>
+        /// <param name="doraMarks">List of dora indicators.</param>
+        /// <param name="uradoraMarks">List of ura-dora indicators.</param>
+        /// <param name="_ronOn">Indicates the wind of the player who gaves the ron (if ron).</param>
+        public HandPointPivot(FullHandPivot eastHand, FullHandPivot southHand,
+            FullHandPivot westHand, FullHandPivot northHand,
+            List<TilePivot> doraMarks, List<TilePivot> uradoraMarks, WindPivot? _ronOn = null)
         {
-            if (yakus == null)
+            _handEast = eastHand ?? throw new ArgumentNullException(nameof(eastHand));
+            _handSouth = southHand ?? throw new ArgumentNullException(nameof(southHand));
+            _handWest = westHand ?? throw new ArgumentNullException(nameof(westHand));
+            _handNorth = northHand ?? throw new ArgumentNullException(nameof(northHand));
+            _doraMarks = doraMarks ?? new List<TilePivot>();
+            _uradoraMarks = _uradoraMarks ?? new List<TilePivot>();
+
+            if (_doraMarks.Count > 4 || _uradoraMarks.Count > 4)
             {
-                throw new ArgumentNullException(nameof(yakus));
+                throw new ArgumentException(Messages.InvalidDorasCountError);
             }
 
-            if (yakus.Count == 0)
-            {
-                throw new ArgumentException(Messages.InvalidYakusListError, nameof(yakus));
-            }
-
-            Yakus = yakus;
+            // List<List<YakuPivot>> yakus = _hand.ComputeHandYakus();
         }
 
         /// <summary>
@@ -185,5 +148,15 @@ namespace MahjongDll.Pivot
                     -(wind == WindPivot.east ? pointsTuple.Item1 : pointsTuple.Item2);
             }
         }
+
+        /// <summary>
+        /// Gets a <see cref="string"/> representation of the instance.
+        /// </summary>
+        /// <returns><see cref="string"/> representation.</returns>
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
+    */
 }

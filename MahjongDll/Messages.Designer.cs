@@ -61,6 +61,15 @@ namespace MahjongDll {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Too many doras specified..
+        /// </summary>
+        internal static string InvalidDorasCountError {
+            get {
+                return ResourceManager.GetString("InvalidDorasCountError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The value of the argument breaks a consistency rule when combined with other arguments..
         /// </summary>
         internal static string InvalidHandArgumentsConsistencyError {

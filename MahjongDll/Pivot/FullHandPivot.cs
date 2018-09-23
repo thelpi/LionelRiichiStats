@@ -212,7 +212,10 @@ namespace MahjongDll.Pivot
         /// <summary>
         /// Computes every yakus extractible from the current hand.
         /// </summary>
-        /// <returns>List of list of yakus (one for each valid combination of tiles). Sorted by descending fans count.</returns>
+        /// <returns>
+        /// List of list of yakus (one for each valid combination of tiles).
+        /// Sorted by descending fans count.
+        /// </returns>
         public List<List<YakuPivot>> ComputeHandYakus()
         {
             List<List<YakuPivot>> groupsOfYakus = new List<List<YakuPivot>>();

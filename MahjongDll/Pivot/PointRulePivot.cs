@@ -68,7 +68,7 @@ namespace MahjongDll.Pivot
                         case 50:
                             return 3200;
                         case 60:
-                            return 3900;
+                            return Rules.Default.Round430Mangan ? 4000 : 3900;
                         case 70:
                             return 4000;
                     }
@@ -81,7 +81,7 @@ namespace MahjongDll.Pivot
                         case 25:
                             return 3200;
                         case 30:
-                            return 3900;
+                            return Rules.Default.Round430Mangan ? 4000 : 3900;
                         case 40:
                         case 50:
                         case 60:
@@ -153,7 +153,7 @@ namespace MahjongDll.Pivot
                         case 50:
                             return 9600;
                         case 60:
-                            return 11600;
+                            return Rules.Default.Round430Mangan ? 12000 : 11600;
                         case 70:
                             return 12000;
                     }
@@ -164,7 +164,7 @@ namespace MahjongDll.Pivot
                         case 25:
                             return 9600;
                         case 30:
-                            return 11600;
+                            return Rules.Default.Round430Mangan ? 12000 : 11600;
                         case 40:
                         case 50:
                         case 60:
@@ -238,7 +238,8 @@ namespace MahjongDll.Pivot
                         case 50:
                             return new Tuple<int, int>(3200, 1600);
                         case 60:
-                            return new Tuple<int, int>(3900, 2000);
+                            return Rules.Default.Round430Mangan ?
+                                new Tuple<int, int>(4000, 2000) : new Tuple<int, int>(3900, 2000);
                         case 70:
                             return new Tuple<int, int>(4000, 2000);
                     }
@@ -251,7 +252,8 @@ namespace MahjongDll.Pivot
                         case 25:
                             return new Tuple<int, int>(3200, 1600);
                         case 30:
-                            return new Tuple<int, int>(3900, 2000);
+                            return Rules.Default.Round430Mangan ?
+                                new Tuple<int, int>(4000, 2000) : new Tuple<int, int>(3900, 2000);
                         case 40:
                         case 50:
                         case 60:
@@ -324,7 +326,7 @@ namespace MahjongDll.Pivot
                         case 50:
                             return 6400;
                         case 60:
-                            return 7700;
+                            return Rules.Default.Round430Mangan ? 8000 : 7700;
                         case 70:
                             return 8000;
                     }
@@ -335,7 +337,7 @@ namespace MahjongDll.Pivot
                         case 25:
                             return 6400;
                         case 30:
-                            return 7700;
+                            return Rules.Default.Round430Mangan ? 8000 : 7700;
                         case 40:
                         case 50:
                         case 60:
