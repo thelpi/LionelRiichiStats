@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,6 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Rules.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -69,6 +75,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -76,6 +86,108 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Rules.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bambou_9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caractère_9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_6.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cercle_9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dragon_blanc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dragon_rouge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dragon_vert.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vent_est.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vent_nord.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vent_ouest.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vent_sud.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

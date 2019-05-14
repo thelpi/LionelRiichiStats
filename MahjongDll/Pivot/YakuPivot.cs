@@ -113,14 +113,14 @@ namespace MahjongDll.Pivot
                 FansConcealed = 1,
                 FansOpen = 1,
                 Name = Chankan,
-                Description = "Win on 4th tile of an opponent calling a opened kan."
+                Description = "Win on the the tile an opponent uses to transform a opened pon to a kan."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 1,
                 FansOpen = 1,
                 Name = Tanyao,
-                Description = "No honors or terminals."
+                Description = "No honor or terminals."
             });
             _yakus.Add(new YakuPivot
             {
@@ -149,14 +149,14 @@ namespace MahjongDll.Pivot
                 FansConcealed = 2,
                 FansOpen = 1,
                 Name = SanshokuDoujun,
-                Description = "Same chi in three family."
+                Description = "Same chi in three families."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 3,
                 FansOpen = 2,
                 Name = Ittsuu,
-                Description = "123456789 in a single family."
+                Description = "123-456-789 sets in a single family."
             });
             _yakus.Add(new YakuPivot
             {
@@ -170,7 +170,7 @@ namespace MahjongDll.Pivot
                 FansConcealed = 2,
                 FansOpen = 2,
                 Name = SanshokuDoukou,
-                Description = "Same pon in three family."
+                Description = "Same pon in three families."
             });
             _yakus.Add(new YakuPivot
             {
@@ -198,14 +198,14 @@ namespace MahjongDll.Pivot
                 FansConcealed = 2,
                 FansOpen = 2,
                 Name = Toitoi,
-                Description = "Pons (or kans) only."
+                Description = "Pons or kans only."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 2,
                 FansOpen = 2,
                 Name = Shousangen,
-                Description = "Two pons or kans or dragons and a pair of dragons."
+                Description = "Two pons or kans or dragons and a pair of the last dragon."
             });
             _yakus.Add(new YakuPivot
             {
@@ -234,7 +234,7 @@ namespace MahjongDll.Pivot
                 FansConcealed = 1,
                 FansOpen = 0,
                 Name = Iipeikou,
-                Description = "Twice the same chi (hand must be closed).",
+                Description = "Twice the same chi (must be concealed).",
                 Upgrades = _yakus.Where(y => y.Name == Ryanpeikou).ToList()
             });
             _yakus.Add(new YakuPivot
@@ -280,42 +280,42 @@ namespace MahjongDll.Pivot
                 FansConcealed = 13,
                 FansOpen = 13,
                 Name = Shousuushi,
-                Description = "Three pons or kans of winds, and a pair of winds."
+                Description = "Three pons or kans of winds, plus a pair of the last wind."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 13,
                 FansOpen = 13,
                 Name = Daisuushi,
-                Description = "Pons or kans of each wind."
+                Description = "Pon or kan of each wind."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 13,
                 FansOpen = 13,
                 Name = Tsuuiisou,
-                Description = "Sets made of honors only."
+                Description = "Each set is made of honors."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 13,
                 FansOpen = 13,
                 Name = Ryuuiisou,
-                Description = "Sets made of green bamboos (2, 3, 4, 6, 8) and green dragons only."
+                Description = "Each set is made of green bamboos (2, 3, 4, 6, 8) or green dragons."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 13,
                 FansOpen = 13,
                 Name = Chinroutou,
-                Description = "Sets made of terminals only."
+                Description = "Each set is made of terminals."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 13,
                 FansOpen = 0,
                 Name = ChuurenPoutou,
-                Description = "1112345678999 in a single family, and on tile of the family."
+                Description = "1112345678999 in a single family, plus any tile of this family."
             });
             _yakus.Add(new YakuPivot
             {
@@ -329,14 +329,14 @@ namespace MahjongDll.Pivot
                 FansConcealed = 13,
                 FansOpen = 0,
                 Name = Tenhou,
-                Description = "Dealer win with initial tiles."
+                Description = "Dealer wins with initial tiles."
             });
             _yakus.Add(new YakuPivot
             {
                 FansConcealed = 13,
                 FansOpen = 0,
                 Name = Chiihou,
-                Description = "Non-dealer win at first pick."
+                Description = "Non-dealer wins at first pick."
             });
         }
 

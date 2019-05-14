@@ -4,30 +4,55 @@ using System.Linq;
 
 namespace MahjongDll.Pivot
 {
-    /*public class DrawPivot
+    /// <summary>
+    /// Represents every <see cref="TilePivot"/> of the game.
+    /// </summary>
+    public class DrawPivot
     {
-        private List<TilePivot> _tiles = new List<TilePivot>();
+        #region Embedded properties
+
+        // Randomizer.
         private Random _randomizer = new Random(DateTime.Now.Millisecond);
 
-        public DrawPivot()
+        /// <summary>
+        /// List of <see cref="TilePivot"/>.
+        /// </summary>
+        public IReadOnlyCollection<TilePivot> Tiles { get; private set; }
+
+        #endregion Embedded properties
+
+        /// <summary>
+        /// Draw every tiles.
+        /// </summary>
+        /// <param name="randomize">Set <c>True</c> to randomize the draw.</param>
+        /// <param name="oneOfEach">Set <c>True</c> to get one of each instead of four.</param>
+        public DrawPivot(bool randomize, bool oneOfEach)
         {
-            for (int i = 0; i < 4; i++)
+            List<TilePivot> tiles = new List<TilePivot>();
+
+            for (int i = 0; i < (oneOfEach ? 1 : 4); i++)
             {
-                _tiles.Add(new TilePivot(DragonPivot.red));
-                _tiles.Add(new TilePivot(DragonPivot.white));
-                _tiles.Add(new TilePivot(DragonPivot.green));
-                _tiles.Add(new TilePivot(WindPivot.east));
-                _tiles.Add(new TilePivot(WindPivot.south));
-                _tiles.Add(new TilePivot(WindPivot.west));
-                _tiles.Add(new TilePivot(WindPivot.north));
+                tiles.Add(new TilePivot(DragonPivot.red));
+                tiles.Add(new TilePivot(DragonPivot.white));
+                tiles.Add(new TilePivot(DragonPivot.green));
+                tiles.Add(new TilePivot(WindPivot.east));
+                tiles.Add(new TilePivot(WindPivot.south));
+                tiles.Add(new TilePivot(WindPivot.west));
+                tiles.Add(new TilePivot(WindPivot.north));
                 for (int j = 1; j <= 9; j++)
                 {
-                    _tiles.Add(new TilePivot(FamilyPivot.character, j));
-                    _tiles.Add(new TilePivot(FamilyPivot.circle, j));
-                    _tiles.Add(new TilePivot(FamilyPivot.bamboo, j));
+                    tiles.Add(new TilePivot(FamilyPivot.character, j));
+                    tiles.Add(new TilePivot(FamilyPivot.circle, j));
+                    tiles.Add(new TilePivot(FamilyPivot.bamboo, j));
                 }
             }
-            _tiles = _tiles.OrderBy(x => _randomizer.NextDouble()).ToList();
+
+            if (randomize)
+            {
+                tiles = tiles.OrderBy(x => _randomizer.NextDouble()).ToList();
+            }
+
+            Tiles = tiles;
         }
-    }*/
+    }
 }

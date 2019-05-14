@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using DllRsc = MahjongDll.Properties.Resources;
 
 namespace MahjongDll.Pivot
 {
@@ -27,6 +29,10 @@ namespace MahjongDll.Pivot
         /// The number between 1 and 9. 0 for dragons and winds.
         /// </summary>
         public int Number { get; private set; }
+        /// <summary>
+        /// The <see cref="Bitmap"/> which provides a graphic visualization of the tile.
+        /// </summary>
+        public Bitmap Graphic { get; private set; }
 
         #endregion
 
@@ -80,6 +86,18 @@ namespace MahjongDll.Pivot
 
             Number = number;
             Family = family;
+
+            string familyName = "caractère";
+            switch (Family)
+            {
+                case FamilyPivot.bamboo:
+                    familyName = "bambou";
+                    break;
+                case FamilyPivot.circle:
+                    familyName = "cercle";
+                    break;
+            }
+            Graphic = (Bitmap)DllRsc.ResourceManager.GetObject(string.Format("{0}_{1}", familyName, Number));
         }
 
         /// <summary>
@@ -90,6 +108,18 @@ namespace MahjongDll.Pivot
         {
             Dragon = dragon;
             Family = FamilyPivot.dragon;
+            switch (dragon)
+            {
+                case DragonPivot.white:
+                    Graphic = DllRsc.dragon_blanc;
+                    break;
+                case DragonPivot.red:
+                    Graphic = DllRsc.dragon_rouge;
+                    break;
+                case DragonPivot.green:
+                    Graphic = DllRsc.dragon_vert;
+                    break;
+            }
         }
 
         /// <summary>
@@ -100,6 +130,21 @@ namespace MahjongDll.Pivot
         {
             Wind = wind;
             Family = FamilyPivot.wind;
+            switch (wind)
+            {
+                case WindPivot.east:
+                    Graphic = DllRsc.vent_est;
+                    break;
+                case WindPivot.south:
+                    Graphic = DllRsc.vent_sud;
+                    break;
+                case WindPivot.west:
+                    Graphic = DllRsc.vent_ouest;
+                    break;
+                case WindPivot.north:
+                    Graphic = DllRsc.vent_nord;
+                    break;
+            }
         }
 
         /// <summary>
