@@ -1,0 +1,153 @@
+﻿<Window x:Class="MahjongHandAnalyzer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MahjongHandAnalyzer"
+        mc:Ignorable="d" Background="Gainsboro" Padding="5"
+        Title="MainWindow" SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <local:BitmapToImageConverter x:Key="bitmapConverter" />
+    </Window.Resources>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="85" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Name="CbbTile01" Grid.Column="00" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile02" Grid.Column="01" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile03" Grid.Column="02" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile04" Grid.Column="03" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile05" Grid.Column="04" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile06" Grid.Column="05" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile07" Grid.Column="06" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile08" Grid.Column="07" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile09" Grid.Column="08" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile10" Grid.Column="09" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile11" Grid.Column="10" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile12" Grid.Column="11" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile13" Grid.Column="12" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox Name="CbbTile14" Grid.Column="13" Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Path=Graphic, Converter={StaticResource ResourceKey=bitmapConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+        <DockPanel DockPanel.Dock="Bottom">
+            <DockPanel DockPanel.Dock="Top">
+                <GroupBox Padding="5" Name="GrbYakus" Header="Yakus">
+                    <StackPanel Orientation="Vertical" Name="StpYakus" />
+                </GroupBox>
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Bottom"  Height="30">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button Height="25" Name="BtnRandomize" Content="Randomize" Width="75" Click="BtnRandomize_Click" />
+                    <Button Height="25" Name="BtnClear" Content="Clear" Width="75" Click="BtnClear_Click" Margin="10, 0, 0, 0" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Label Content="Vent dominant :" Height="25" />
+                    <ComboBox Height="25" Name="CbbWindDominant" Width="75" VerticalContentAlignment="Center" />
+                    <Label Content="Vent du tour :" Height="25" />
+                    <ComboBox Height="25" Name="CbbWindTurn" Width="75" VerticalContentAlignment="Center" />
+                    <Button Margin="10, 0, 0, 0" Height="25" Name="BtnAnalyze" Content="Analyze" Width="75" Click="BtnAnalyze_Click" />
+                </StackPanel>
+            </DockPanel>
+        </DockPanel>
+    </DockPanel>
+</Window>
