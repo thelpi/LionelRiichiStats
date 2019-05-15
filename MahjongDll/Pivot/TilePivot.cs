@@ -42,12 +42,12 @@ namespace MahjongDll.Pivot
         /// Gtes if the tile is a dragon.
         /// </summary>
         public bool IsDragon =>
-            Family == FamilyPivot.dragon;
+            Family == FamilyPivot.Dragon;
         /// <summary>
         /// Gets if the tile is a wind.
         /// </summary>
         public bool IsWind =>
-            Family == FamilyPivot.wind;
+            Family == FamilyPivot.Wind;
         /// <summary>
         /// Gets if the tile is a wind or a dragon.
         /// </summary>
@@ -75,7 +75,7 @@ namespace MahjongDll.Pivot
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidTileFamilyError"/></exception>
         public TilePivot(FamilyPivot family, int number)
         {
-            if (family == FamilyPivot.dragon || family == FamilyPivot.wind)
+            if (family == FamilyPivot.Dragon || family == FamilyPivot.Wind)
             {
                 throw new ArgumentException(Messages.InvalidTileFamilyError, nameof(family));
             }
@@ -90,10 +90,10 @@ namespace MahjongDll.Pivot
             string familyName = "caractère";
             switch (Family)
             {
-                case FamilyPivot.bamboo:
+                case FamilyPivot.Bamboo:
                     familyName = "bambou";
                     break;
-                case FamilyPivot.circle:
+                case FamilyPivot.Circle:
                     familyName = "cercle";
                     break;
             }
@@ -107,16 +107,16 @@ namespace MahjongDll.Pivot
         public TilePivot(DragonPivot dragon)
         {
             Dragon = dragon;
-            Family = FamilyPivot.dragon;
+            Family = FamilyPivot.Dragon;
             switch (dragon)
             {
-                case DragonPivot.white:
+                case DragonPivot.White:
                     Graphic = DllRsc.dragon_blanc;
                     break;
-                case DragonPivot.red:
+                case DragonPivot.Red:
                     Graphic = DllRsc.dragon_rouge;
                     break;
-                case DragonPivot.green:
+                case DragonPivot.Green:
                     Graphic = DllRsc.dragon_vert;
                     break;
             }
@@ -129,19 +129,19 @@ namespace MahjongDll.Pivot
         public TilePivot(WindPivot wind)
         {
             Wind = wind;
-            Family = FamilyPivot.wind;
+            Family = FamilyPivot.Wind;
             switch (wind)
             {
-                case WindPivot.east:
+                case WindPivot.East:
                     Graphic = DllRsc.vent_est;
                     break;
-                case WindPivot.south:
+                case WindPivot.South:
                     Graphic = DllRsc.vent_sud;
                     break;
-                case WindPivot.west:
+                case WindPivot.West:
                     Graphic = DllRsc.vent_ouest;
                     break;
-                case WindPivot.north:
+                case WindPivot.North:
                     Graphic = DllRsc.vent_nord;
                     break;
             }

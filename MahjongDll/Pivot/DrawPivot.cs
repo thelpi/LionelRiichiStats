@@ -21,38 +21,69 @@ namespace MahjongDll.Pivot
 
         #endregion Embedded properties
 
+        #region Inferred properties
+
         /// <summary>
-        /// Draw every tiles.
+        /// Inferred; List of unique <see cref="TilePivot"/>.
         /// </summary>
-        /// <param name="randomize">Set <c>True</c> to randomize the draw.</param>
-        /// <param name="oneOfEach">Set <c>True</c> to get one of each instead of four.</param>
-        public DrawPivot(bool randomize, bool oneOfEach)
+        public IReadOnlyCollection<TilePivot> UniqueTiles { get { return Tiles.Distinct().ToList(); } }
+
+        #endregion Inferred properties
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public DrawPivot()
         {
             List<TilePivot> tiles = new List<TilePivot>();
 
-            for (int i = 0; i < (oneOfEach ? 1 : 4); i++)
+            for (int i = 0; i < 4; i++)
             {
-                tiles.Add(new TilePivot(DragonPivot.red));
-                tiles.Add(new TilePivot(DragonPivot.white));
-                tiles.Add(new TilePivot(DragonPivot.green));
-                tiles.Add(new TilePivot(WindPivot.east));
-                tiles.Add(new TilePivot(WindPivot.south));
-                tiles.Add(new TilePivot(WindPivot.west));
-                tiles.Add(new TilePivot(WindPivot.north));
+                tiles.Add(new TilePivot(DragonPivot.Red));
+                tiles.Add(new TilePivot(DragonPivot.White));
+                tiles.Add(new TilePivot(DragonPivot.Green));
+                tiles.Add(new TilePivot(WindPivot.East));
+                tiles.Add(new TilePivot(WindPivot.South));
+                tiles.Add(new TilePivot(WindPivot.West));
+                tiles.Add(new TilePivot(WindPivot.North));
                 for (int j = 1; j <= 9; j++)
                 {
-                    tiles.Add(new TilePivot(FamilyPivot.character, j));
-                    tiles.Add(new TilePivot(FamilyPivot.circle, j));
-                    tiles.Add(new TilePivot(FamilyPivot.bamboo, j));
+                    tiles.Add(new TilePivot(FamilyPivot.Character, j));
+                    tiles.Add(new TilePivot(FamilyPivot.Circle, j));
+                    tiles.Add(new TilePivot(FamilyPivot.Bamboo, j));
                 }
             }
 
-            if (randomize)
-            {
-                tiles = tiles.OrderBy(x => _randomizer.NextDouble()).ToList();
-            }
+            tiles.Sort();
 
             Tiles = tiles;
+        }
+
+        /// <summary>
+        /// Picks an hand of 14 tiles.
+        /// </summary>
+        /// <returns>List of <see cref="TilePivot"/>.</returns>
+        public IReadOnlyCollection<TilePivot> PickHandOfTiles()
+        {
+            List<TilePivot> picks = new List<TilePivot>();
+            List<int> indexes = new List<int>();
+            for (int i = 0; i < 14; i++)
+            {
+                bool added = false;
+                do
+                {
+                    int nextIndex = _randomizer.Next(0, Tiles.Count);
+                    if (!indexes.Contains(nextIndex))
+                    {
+                        picks.Add(Tiles.ElementAt(nextIndex));
+                        indexes.Add(nextIndex);
+                        added = true;
+                    }
+                }
+                while (!added);
+            }
+            picks.Sort();
+            return picks;
         }
     }
 }

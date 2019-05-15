@@ -88,7 +88,7 @@ namespace MahjongDll.Pivot
         /// <summary>
         /// List of tiles which are not in declared sets.
         /// </summary>
-        public List<TilePivot> UnsetTiles
+        public IReadOnlyCollection<TilePivot> UnsetTiles
         {
             get
             {
@@ -103,6 +103,19 @@ namespace MahjongDll.Pivot
                     _unsetTiles.Sort();
                 }
                 return _unsetTiles;
+            }
+        }
+        /// <summary>
+        /// List of every tiles of the hand.
+        /// </summary>
+        /// <remarks>Doesn't include fourth tile of each kan.</remarks>
+        public IReadOnlyCollection<TilePivot> AllTiles
+        {
+            get
+            {
+                List<TilePivot> tmpList = new List<TilePivot>(UnsetTiles);
+                tmpList.AddRange(OpenedSets.SelectMany(x => x.Tiles.Take(3)));
+                return tmpList;
             }
         }
 
@@ -191,8 +204,9 @@ namespace MahjongDll.Pivot
         /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
         /// <param name="dominantWind"><see cref="DominantWind"/>.</param>
         /// <param name="turnWind"><see cref="TurnWind"/>.</param>
+        /// <param name="isInitialDraw"><see cref="IsInitialDraw"/>.</param>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
-        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot turnWind)
+        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot turnWind, bool isInitialDraw = true)
         {
             tiles = tiles ?? new List<TilePivot>();
 
@@ -206,7 +220,20 @@ namespace MahjongDll.Pivot
             TurnWind = turnWind;
             OpenedSets = new List<SetPivot>();
             ConcealedKans = new List<SetPivot>();
-            IsInitialDraw = true;
+            IsInitialDraw = isInitialDraw;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <param name="substitutions"></param>
+        /// <returns></returns>
+        public static FullHandPivot FromHand(FullHandPivot hand, Tuple<TilePivot, TilePivot>[] substitutions)
+        {
+            List<TilePivot> tiles = hand.AllTiles.ToList();
+            // subs
+            return new FullHandPivot(tiles, hand.DominantWind, hand.TurnWind, hand.IsInitialDraw);
         }
 
         /// <summary>
@@ -297,8 +324,8 @@ namespace MahjongDll.Pivot
                                         || currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Any(c => c.Count() == 4);
                                     break;
                                 case YakuPivot.Ryuuiisou:
-                                    validCombination = currentCombo.All(c => c.Dragon == DragonPivot.green
-                                        || (c.Family == FamilyPivot.bamboo && c.Tiles.All(t => t.Number == 3 || t.Number % 2 == 0)));
+                                    validCombination = currentCombo.All(c => c.Dragon == DragonPivot.Green
+                                        || (c.Family == FamilyPivot.Bamboo && c.Tiles.All(t => t.Number == 3 || t.Number % 2 == 0)));
                                     break;
                                 case YakuPivot.Sanankou:
                                     validCombination = CountConealedPons(currentCombo, 3);
@@ -308,7 +335,7 @@ namespace MahjongDll.Pivot
                                     break;
                                 case YakuPivot.SanshokuDoujun:
                                     validCombination = currentCombo.Where(c => c.IsChi).GroupBy(c => c.FirstNumber).Any(c => c.Count() >= 3
-                                        && new FamilyPivot[] { FamilyPivot.bamboo, FamilyPivot.character, FamilyPivot.circle }.All(f =>
+                                        && new FamilyPivot[] { FamilyPivot.Bamboo, FamilyPivot.Character, FamilyPivot.Circle }.All(f =>
                                             c.Any(set => set.Family == f)));
                                     break;
                                 case YakuPivot.SanshokuDoukou:
@@ -410,7 +437,7 @@ namespace MahjongDll.Pivot
                         isIn = IsChankan;
                         break;
                     case YakuPivot.Chiihou:
-                        isIn = IsInitialDraw && TurnWind != WindPivot.east;
+                        isIn = IsInitialDraw && TurnWind != WindPivot.East;
                         break;
                     case YakuPivot.DoubleRiichi:
                         isIn = IsDoubleRiichi;
@@ -428,7 +455,7 @@ namespace MahjongDll.Pivot
                         isIn = IsRinshankaihou;
                         break;
                     case YakuPivot.Tenhou:
-                        isIn = IsInitialDraw && TurnWind == WindPivot.east;
+                        isIn = IsInitialDraw && TurnWind == WindPivot.East;
                         break;
                 }
                 if (isIn)
@@ -526,7 +553,7 @@ namespace MahjongDll.Pivot
             {
                 switch (family.Key)
                 {
-                    case FamilyPivot.dragon:
+                    case FamilyPivot.Dragon:
                         List<SetPivot> setsOfDragons = new List<SetPivot>();
                         foreach (var dragon in family.GroupBy(t => t.Dragon.Value))
                         {
@@ -537,7 +564,7 @@ namespace MahjongDll.Pivot
                         }
                         AddWindOrDragonSetsToListOfSetsList(listOf_FourthSetsAndAPair, setsOfDragons);
                         break;
-                    case FamilyPivot.wind:
+                    case FamilyPivot.Wind:
                         List<SetPivot> setsOfWinds = new List<SetPivot>();
                         foreach (var wind in family.GroupBy(t => t.Wind.Value))
                         {

@@ -9,14 +9,14 @@
         /// <summary>
         /// Red.
         /// </summary>
-        red,
+        Red,
         /// <summary>
         /// White.
         /// </summary>
-        white,
+        White,
         /// <summary>
         /// Green.
         /// </summary>
-        green
+        Green
     }
 }

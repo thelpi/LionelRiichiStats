@@ -14,27 +14,27 @@ namespace MahjongTestUnit
         [TestMethod]
         public void Test_DoubleYakuPai()
         {
-            SetPivot openedSets = new SetPivot(new TilePivot(WindPivot.east),
-                new TilePivot(WindPivot.east),
-                new TilePivot(WindPivot.east));
+            SetPivot openedSets = new SetPivot(new TilePivot(WindPivot.East),
+                new TilePivot(WindPivot.East),
+                new TilePivot(WindPivot.East));
 
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(FamilyPivot.bamboo, 4),
-                new TilePivot(FamilyPivot.bamboo, 5),
-                new TilePivot(FamilyPivot.bamboo, 6),
-                new TilePivot(FamilyPivot.bamboo, 5),
-                new TilePivot(FamilyPivot.bamboo, 6),
-                new TilePivot(FamilyPivot.bamboo, 7),
-                new TilePivot(FamilyPivot.circle, 3),
-                new TilePivot(FamilyPivot.circle, 3),
-                new TilePivot(FamilyPivot.circle, 1),
-                new TilePivot(FamilyPivot.circle, 2)
+                new TilePivot(FamilyPivot.Bamboo, 4),
+                new TilePivot(FamilyPivot.Bamboo, 5),
+                new TilePivot(FamilyPivot.Bamboo, 6),
+                new TilePivot(FamilyPivot.Bamboo, 5),
+                new TilePivot(FamilyPivot.Bamboo, 6),
+                new TilePivot(FamilyPivot.Bamboo, 7),
+                new TilePivot(FamilyPivot.Circle, 3),
+                new TilePivot(FamilyPivot.Circle, 3),
+                new TilePivot(FamilyPivot.Circle, 1),
+                new TilePivot(FamilyPivot.Circle, 2)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east,
-                new TilePivot(FamilyPivot.circle, 3),
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East,
+                new TilePivot(FamilyPivot.Circle, 3),
                 openedSets: new List<SetPivot> { openedSets });
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
@@ -51,24 +51,24 @@ namespace MahjongTestUnit
         {
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(FamilyPivot.character, 2),
-                new TilePivot(FamilyPivot.character, 2),
-                new TilePivot(FamilyPivot.character, 5),
-                new TilePivot(FamilyPivot.character, 5),
-                new TilePivot(FamilyPivot.character, 6),
-                new TilePivot(FamilyPivot.character, 6),
-                new TilePivot(FamilyPivot.bamboo, 4),
-                new TilePivot(FamilyPivot.bamboo, 4),
-                new TilePivot(FamilyPivot.bamboo, 8),
-                new TilePivot(FamilyPivot.bamboo, 8),
-                new TilePivot(FamilyPivot.circle, 5),
-                new TilePivot(FamilyPivot.circle, 5),
-                new TilePivot(FamilyPivot.circle, 8)
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 5),
+                new TilePivot(FamilyPivot.Character, 5),
+                new TilePivot(FamilyPivot.Character, 6),
+                new TilePivot(FamilyPivot.Character, 6),
+                new TilePivot(FamilyPivot.Bamboo, 4),
+                new TilePivot(FamilyPivot.Bamboo, 4),
+                new TilePivot(FamilyPivot.Bamboo, 8),
+                new TilePivot(FamilyPivot.Bamboo, 8),
+                new TilePivot(FamilyPivot.Circle, 5),
+                new TilePivot(FamilyPivot.Circle, 5),
+                new TilePivot(FamilyPivot.Circle, 8)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east,
-                new TilePivot(FamilyPivot.circle, 8), isRon: false, isDoubleRiichi: true, isIppatsu: true);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East,
+                new TilePivot(FamilyPivot.Circle, 8), isRon: false, isDoubleRiichi: true, isIppatsu: true);
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
 
@@ -88,31 +88,31 @@ namespace MahjongTestUnit
         {
             List<SetPivot> concealedKans = new List<SetPivot>
             {
-                new SetPivot(new TilePivot(DragonPivot.white),
-                    new TilePivot(DragonPivot.white),
-                    new TilePivot(DragonPivot.white),
-                    new TilePivot(DragonPivot.white)),
-                new SetPivot(new TilePivot(DragonPivot.green),
-                    new TilePivot(DragonPivot.green),
-                    new TilePivot(DragonPivot.green),
-                    new TilePivot(DragonPivot.green)),
-                new SetPivot(new TilePivot(WindPivot.north),
-                    new TilePivot(WindPivot.north),
-                    new TilePivot(WindPivot.north),
-                    new TilePivot(WindPivot.north))
+                new SetPivot(new TilePivot(DragonPivot.White),
+                    new TilePivot(DragonPivot.White),
+                    new TilePivot(DragonPivot.White),
+                    new TilePivot(DragonPivot.White)),
+                new SetPivot(new TilePivot(DragonPivot.Green),
+                    new TilePivot(DragonPivot.Green),
+                    new TilePivot(DragonPivot.Green),
+                    new TilePivot(DragonPivot.Green)),
+                new SetPivot(new TilePivot(WindPivot.North),
+                    new TilePivot(WindPivot.North),
+                    new TilePivot(WindPivot.North),
+                    new TilePivot(WindPivot.North))
             };
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(DragonPivot.red),
-                new TilePivot(DragonPivot.red),
-                new TilePivot(FamilyPivot.circle, 9),
-                new TilePivot(FamilyPivot.circle, 9)
+                new TilePivot(DragonPivot.Red),
+                new TilePivot(DragonPivot.Red),
+                new TilePivot(FamilyPivot.Circle, 9),
+                new TilePivot(FamilyPivot.Circle, 9)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
             // Note : this is an impossible hand, as Chankan can be made on something else than a chi.
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north,
-                new TilePivot(FamilyPivot.circle, 9), concealedKans: concealedKans,
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North,
+                new TilePivot(FamilyPivot.Circle, 9), concealedKans: concealedKans,
                 isChankan: true, isRon: true);
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
@@ -136,24 +136,24 @@ namespace MahjongTestUnit
         {
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(FamilyPivot.character, 1),
-                new TilePivot(FamilyPivot.character, 2),
-                new TilePivot(FamilyPivot.character, 2),
-                new TilePivot(FamilyPivot.character, 3),
-                new TilePivot(FamilyPivot.character, 3),
-                new TilePivot(FamilyPivot.character, 7),
-                new TilePivot(FamilyPivot.character, 7),
-                new TilePivot(FamilyPivot.character, 8),
-                new TilePivot(FamilyPivot.character, 8),
-                new TilePivot(FamilyPivot.character, 9),
-                new TilePivot(FamilyPivot.character, 9),
-                new TilePivot(FamilyPivot.character, 9),
-                new TilePivot(FamilyPivot.character, 9),
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 3),
+                new TilePivot(FamilyPivot.Character, 3),
+                new TilePivot(FamilyPivot.Character, 7),
+                new TilePivot(FamilyPivot.Character, 7),
+                new TilePivot(FamilyPivot.Character, 8),
+                new TilePivot(FamilyPivot.Character, 8),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(FamilyPivot.Character, 9),
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north,
-                new TilePivot(FamilyPivot.character, 1), isRon: true);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North,
+                new TilePivot(FamilyPivot.Character, 1), isRon: true);
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
 
@@ -175,24 +175,24 @@ namespace MahjongTestUnit
         {
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(FamilyPivot.character, 1),
-                new TilePivot(FamilyPivot.character, 9),
-                new TilePivot(FamilyPivot.circle, 1),
-                new TilePivot(FamilyPivot.circle, 9),
-                new TilePivot(FamilyPivot.bamboo, 1),
-                new TilePivot(FamilyPivot.bamboo, 9),
-                new TilePivot(WindPivot.east),
-                new TilePivot(WindPivot.south),
-                new TilePivot(WindPivot.north),
-                new TilePivot(WindPivot.west),
-                new TilePivot(DragonPivot.red),
-                new TilePivot(DragonPivot.green),
-                new TilePivot(DragonPivot.white),
-                new TilePivot(DragonPivot.white)
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(FamilyPivot.Circle, 1),
+                new TilePivot(FamilyPivot.Circle, 9),
+                new TilePivot(FamilyPivot.Bamboo, 1),
+                new TilePivot(FamilyPivot.Bamboo, 9),
+                new TilePivot(WindPivot.East),
+                new TilePivot(WindPivot.South),
+                new TilePivot(WindPivot.North),
+                new TilePivot(WindPivot.West),
+                new TilePivot(DragonPivot.Red),
+                new TilePivot(DragonPivot.Green),
+                new TilePivot(DragonPivot.White),
+                new TilePivot(DragonPivot.White)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.east);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East);
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
 
@@ -209,24 +209,24 @@ namespace MahjongTestUnit
         {
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(FamilyPivot.bamboo, 1),
-                new TilePivot(FamilyPivot.bamboo, 1),
-                new TilePivot(FamilyPivot.bamboo, 1),
-                new TilePivot(FamilyPivot.bamboo, 2),
-                new TilePivot(FamilyPivot.bamboo, 3),
-                new TilePivot(FamilyPivot.bamboo, 4),
-                new TilePivot(FamilyPivot.bamboo, 5),
-                new TilePivot(FamilyPivot.bamboo, 6),
-                new TilePivot(FamilyPivot.bamboo, 7),
-                new TilePivot(FamilyPivot.bamboo, 8),
-                new TilePivot(FamilyPivot.bamboo, 9),
-                new TilePivot(FamilyPivot.bamboo, 9),
-                new TilePivot(FamilyPivot.bamboo, 9),
-                new TilePivot(FamilyPivot.bamboo, 3)
+                new TilePivot(FamilyPivot.Bamboo, 1),
+                new TilePivot(FamilyPivot.Bamboo, 1),
+                new TilePivot(FamilyPivot.Bamboo, 1),
+                new TilePivot(FamilyPivot.Bamboo, 2),
+                new TilePivot(FamilyPivot.Bamboo, 3),
+                new TilePivot(FamilyPivot.Bamboo, 4),
+                new TilePivot(FamilyPivot.Bamboo, 5),
+                new TilePivot(FamilyPivot.Bamboo, 6),
+                new TilePivot(FamilyPivot.Bamboo, 7),
+                new TilePivot(FamilyPivot.Bamboo, 8),
+                new TilePivot(FamilyPivot.Bamboo, 9),
+                new TilePivot(FamilyPivot.Bamboo, 9),
+                new TilePivot(FamilyPivot.Bamboo, 9),
+                new TilePivot(FamilyPivot.Bamboo, 3)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North);
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
 
@@ -243,24 +243,24 @@ namespace MahjongTestUnit
         {
             List<TilePivot> tiles = new List<TilePivot>
             {
-                new TilePivot(FamilyPivot.character, 1),
-                new TilePivot(FamilyPivot.character, 1),
-                new TilePivot(FamilyPivot.character, 2),
-                new TilePivot(FamilyPivot.character, 3),
-                new TilePivot(FamilyPivot.character, 3),
-                new TilePivot(FamilyPivot.character, 7),
-                new TilePivot(FamilyPivot.character, 7),
-                new TilePivot(FamilyPivot.character, 8),
-                new TilePivot(FamilyPivot.character, 8),
-                new TilePivot(FamilyPivot.character, 9),
-                new TilePivot(FamilyPivot.character, 9),
-                new TilePivot(FamilyPivot.circle, 4),
-                new TilePivot(FamilyPivot.circle, 4),
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 3),
+                new TilePivot(FamilyPivot.Character, 3),
+                new TilePivot(FamilyPivot.Character, 7),
+                new TilePivot(FamilyPivot.Character, 7),
+                new TilePivot(FamilyPivot.Character, 8),
+                new TilePivot(FamilyPivot.Character, 8),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(FamilyPivot.Circle, 4),
+                new TilePivot(FamilyPivot.Circle, 4),
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.east, WindPivot.north,
-                new TilePivot(FamilyPivot.character, 2), isRon: true, isRiichi: true);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North,
+                new TilePivot(FamilyPivot.Character, 2), isRon: true, isRiichi: true);
 
             List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
 

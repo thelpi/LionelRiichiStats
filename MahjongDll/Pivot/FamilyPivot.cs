@@ -9,22 +9,22 @@
         /// <summary>
         /// Character.
         /// </summary>
-        character,
+        Character,
         /// <summary>
         /// Circle.
         /// </summary>
-        circle,
+        Circle,
         /// <summary>
         /// Bamboo.
         /// </summary>
-        bamboo,
+        Bamboo,
         /// <summary>
         /// Wind.
         /// </summary>
-        wind,
+        Wind,
         /// <summary>
         /// Dragon.
         /// </summary>
-        dragon
+        Dragon
     }
 }

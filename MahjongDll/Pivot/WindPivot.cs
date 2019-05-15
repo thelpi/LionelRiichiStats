@@ -9,18 +9,18 @@
         /// <summary>
         /// East.
         /// </summary>
-        east,
+        East,
         /// <summary>
         /// South.
         /// </summary>
-        south,
+        South,
         /// <summary>
         /// West.
         /// </summary>
-        west,
+        West,
         /// <summary>
         /// North.
         /// </summary>
-        north
+        North
     }
 }
