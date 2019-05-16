@@ -48,7 +48,7 @@ namespace MahjongHandAnalyzer
                 handTiles.Add(GetCombo(i).SelectedItem as TilePivot);
             }
 
-            List<YakuPivot> yakusList = null;
+            HandYakuListPivot handYakus = null;
             int iteration = 0;
             List<Tuple<TilePivot, TilePivot>> substitutions = new List<Tuple<TilePivot, TilePivot>>();
             do
@@ -59,7 +59,7 @@ namespace MahjongHandAnalyzer
                         CbbWindDominant.SelectedIndex > -1 ? (WindPivot)CbbWindDominant.SelectedItem : WindPivot.East,
                         CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
                         false);
-                    yakusList = hand.ComputeHandYakus()?.FirstOrDefault();
+                    handYakus = hand.ComputeHandYakus()?.FirstOrDefault();
                 }
                 else if (iteration == 1)
                 {
@@ -78,10 +78,10 @@ namespace MahjongHandAnalyzer
                                 CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
                                 false);
 
-                            List<YakuPivot> tempBestYakusList = hand.ComputeHandYakus()?.FirstOrDefault();
-                            if (tempBestYakusList != null && (yakusList == null || tempBestYakusList.Sum(x => x.FansConcealed) > yakusList?.Sum(x => x.FansConcealed)))
+                            HandYakuListPivot tempBestYakusList = hand.ComputeHandYakus()?.FirstOrDefault();
+                            if (tempBestYakusList != null && (handYakus == null || tempBestYakusList.OfficialFansCount > handYakus.OfficialFansCount))
                             {
-                                yakusList = tempBestYakusList;
+                                handYakus = tempBestYakusList;
                                 substitutions.Clear();
                                 substitutions.Add(substitution);
                             }
@@ -103,7 +103,7 @@ namespace MahjongHandAnalyzer
                 }
                 iteration++;
             }
-            while (yakusList?.Any() != true);
+            while (handYakus == null);
 
             if (substitutions != null)
             {
@@ -119,9 +119,7 @@ namespace MahjongHandAnalyzer
                 StpYakus.Children.Add(subTb);
             }
 
-            int fansCount = 0;
-            int yakumanCount = 0;
-            foreach (YakuPivot yaku in yakusList)
+            foreach (YakuPivot yaku in handYakus.Yakus)
             {
                 TextBlock tb = new TextBlock
                 {
@@ -130,46 +128,34 @@ namespace MahjongHandAnalyzer
                     ToolTip = yaku.Description
                 };
                 StpYakus.Children.Add(tb);
-                fansCount += yaku.FansConcealed;
-                if (yaku.Yakuman)
-                {
-                    yakumanCount++;
-                }
             }
             string fansLabel = string.Empty;
-            if (yakumanCount > 0 || fansCount >= 13)
+            if (handYakus.Yakuman)
             {
-                if (yakumanCount > 0)
-                {
-                    fansLabel = $"Yakuman ({yakumanCount})";
-                }
-                else
-                {
-                    fansLabel = $"Kazoe yakuman ({fansCount} fans)";
-                }
+                fansLabel = $"Yakuman";
             }
             else
             {
-                switch (fansCount)
+                switch (handYakus.OfficialFansCount)
                 {
                     case 12:
                     case 11:
-                        fansLabel = $"Sanbaiman ({fansCount} fans)";
+                        fansLabel = $"Sanbaiman ({handYakus.OfficialFansCount} fans)";
                         break;
                     case 10:
                     case 9:
                     case 8:
-                        fansLabel = $"Baiman ({fansCount} fans)";
+                        fansLabel = $"Baiman ({handYakus.OfficialFansCount} fans)";
                         break;
                     case 7:
                     case 6:
-                        fansLabel = $"Haneman ({fansCount} fans)";
+                        fansLabel = $"Haneman ({handYakus.OfficialFansCount} fans)";
                         break;
                     case 5:
-                        fansLabel = $"Mangan ({fansCount} fans)";
+                        fansLabel = $"Mangan ({handYakus.OfficialFansCount} fans)";
                         break;
                     default:
-                        fansLabel = $"Total : {fansCount} fans";
+                        fansLabel = $"Total : {handYakus.OfficialFansCount} fans";
                         break;
                 }
             }

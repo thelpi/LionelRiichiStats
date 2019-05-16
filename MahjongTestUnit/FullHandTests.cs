@@ -37,13 +37,13 @@ namespace MahjongTestUnit
                 new TilePivot(FamilyPivot.Circle, 3),
                 openedSets: new List<SetPivot> { openedSets });
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(2, groupsOfYakus[0].Count);
-            Assert.IsTrue(groupsOfYakus[0].All(y => y.Name == YakuPivot.Yakuhai));
+            Assert.AreEqual(2, groupsOfYakus[0].Yakus.Count);
+            Assert.IsTrue(groupsOfYakus[0].Yakus.All(y => y.Name == YakuPivot.Yakuhai));
         }
 
         [TestMethod]
@@ -70,17 +70,17 @@ namespace MahjongTestUnit
             FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East,
                 new TilePivot(FamilyPivot.Circle, 8), isRon: false, isDoubleRiichi: true, isIppatsu: true);
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(5, groupsOfYakus[0].Count);
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Tanyao)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.MenzenTsumo)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.DoubleRiichi)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Ippatsu)));
+            Assert.AreEqual(5, groupsOfYakus[0].Yakus.Count);
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Tanyao)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.MenzenTsumo)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.DoubleRiichi)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Ippatsu)));
         }
 
         [TestMethod]
@@ -115,20 +115,20 @@ namespace MahjongTestUnit
                 new TilePivot(FamilyPivot.Circle, 9), concealedKans: concealedKans,
                 isChankan: true, isRon: true);
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(10, groupsOfYakus[0].Count);
-            Assert.AreEqual(3, groupsOfYakus[0].Count(y => y.Name == YakuPivot.Yakuhai));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Toitoi)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Sanankou)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Honitsu)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Shousangen)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Honroutou)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Chankan)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Sankantsu)));
+            Assert.AreEqual(10, groupsOfYakus[0].Yakus.Count);
+            Assert.AreEqual(3, groupsOfYakus[0].Yakus.Count(y => y.Name == YakuPivot.Yakuhai));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Toitoi)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Sanankou)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Honitsu)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Shousangen)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Honroutou)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chankan)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Sankantsu)));
         }
 
         [TestMethod]
@@ -155,19 +155,19 @@ namespace MahjongTestUnit
             FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North,
                 new TilePivot(FamilyPivot.Character, 1), isRon: true);
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(4, groupsOfYakus[0].Count);
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Chinitsu)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Ryanpeikou)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Junchantaiyao)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Pinfu)));
-            Assert.IsFalse(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
-            Assert.IsFalse(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Honitsu)));
-            Assert.IsFalse(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Chantaiyao)));
+            Assert.AreEqual(4, groupsOfYakus[0].Yakus.Count);
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chinitsu)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Ryanpeikou)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Junchantaiyao)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Pinfu)));
+            Assert.IsFalse(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
+            Assert.IsFalse(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Honitsu)));
+            Assert.IsFalse(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chantaiyao)));
         }
 
         [TestMethod]
@@ -194,14 +194,14 @@ namespace MahjongTestUnit
 
             FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East);
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(2, groupsOfYakus[0].Count);
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Tenhou)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.KokushiMusou)));
+            Assert.AreEqual(2, groupsOfYakus[0].Yakus.Count);
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Tenhou)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.KokushiMusou)));
         }
 
         [TestMethod]
@@ -228,14 +228,14 @@ namespace MahjongTestUnit
 
             FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North);
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(2, groupsOfYakus[0].Count);
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Chiihou)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.ChuurenPoutou)));
+            Assert.AreEqual(2, groupsOfYakus[0].Yakus.Count);
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chiihou)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.ChuurenPoutou)));
         }
 
         [TestMethod]
@@ -262,18 +262,48 @@ namespace MahjongTestUnit
             FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North,
                 new TilePivot(FamilyPivot.Character, 2), isRon: true, isRiichi: true);
 
-            List<List<YakuPivot>> groupsOfYakus = handPivot.ComputeHandYakus();
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(2, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
             Assert.IsNotNull(groupsOfYakus[1]);
-            Assert.AreEqual(2, groupsOfYakus[0].Count);
-            Assert.AreEqual(2, groupsOfYakus[1].Count);
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Ryanpeikou)));
-            Assert.IsTrue(groupsOfYakus[0].Contains(YakuPivot.Get(YakuPivot.Riichi)));
-            Assert.IsTrue(groupsOfYakus[1].Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
-            Assert.IsTrue(groupsOfYakus[1].Contains(YakuPivot.Get(YakuPivot.Riichi)));
+            Assert.AreEqual(2, groupsOfYakus[0].Yakus.Count);
+            Assert.AreEqual(2, groupsOfYakus[1].Yakus.Count);
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Ryanpeikou)));
+            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Riichi)));
+            Assert.IsTrue(groupsOfYakus[1].Yakus.Contains(YakuPivot.Get(YakuPivot.Chiitoitsu)));
+            Assert.IsTrue(groupsOfYakus[1].Yakus.Contains(YakuPivot.Get(YakuPivot.Riichi)));
+        }
+
+        [TestMethod]
+        public void Test_NotAValidHand()
+        {
+            List<TilePivot> tiles = new List<TilePivot>
+            {
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Bamboo, 1),
+                new TilePivot(FamilyPivot.Bamboo, 2),
+                new TilePivot(FamilyPivot.Bamboo, 3),
+                new TilePivot(FamilyPivot.Bamboo, 7),
+                new TilePivot(FamilyPivot.Bamboo, 7),
+                new TilePivot(FamilyPivot.Character, 7),
+                new TilePivot(FamilyPivot.Character, 8),
+                new TilePivot(FamilyPivot.Character, 9),
+                new TilePivot(WindPivot.North),
+                new TilePivot(DragonPivot.Red),
+                new TilePivot(DragonPivot.Red),
+                new TilePivot(FamilyPivot.Character, 1)
+            };
+            tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
+
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North);
+
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
+
+            Assert.IsNotNull(groupsOfYakus);
+            Assert.AreEqual(0, groupsOfYakus.Count);
         }
     }
 }

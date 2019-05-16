@@ -147,6 +147,9 @@
   <data name="InvalidYakuRulesError" xml:space="preserve">
     <value>The list of yakus doesn"t comply properties of the hand.</value>
   </data>
+  <data name="InvalidYakusCountError" xml:space="preserve">
+    <value>The list should have at least one yaku and no Null value.</value>
+  </data>
   <data name="InvalidYakusListError" xml:space="preserve">
     <value>The list of yakus should contains at least one element.</value>
   </data>

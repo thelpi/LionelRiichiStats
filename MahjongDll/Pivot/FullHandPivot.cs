@@ -227,10 +227,10 @@ namespace MahjongDll.Pivot
         /// Computes every yakus extractible from the current hand.
         /// </summary>
         /// <returns>
-        /// List of list of yakus (one for each valid combination of tiles).
+        /// List of <see cref="HandYakuListPivot"/> (one for each valid combination of tiles).
         /// Sorted by descending fans count.
         /// </returns>
-        public List<List<YakuPivot>> ComputeHandYakus()
+        public List<HandYakuListPivot> ComputeHandYakus()
         {
             List<List<YakuPivot>> groupsOfYakus = new List<List<YakuPivot>>();
             bool checkCircumstantialYakus = false;
@@ -391,9 +391,10 @@ namespace MahjongDll.Pivot
             }
 
             return groupsOfYakus
-                    .OrderByDescending(ys =>
-                        ys.Sum(y =>
-                            (IsOpen ? y.FansOpen : y.FansConcealed)))
+                    .Select(y => new HandYakuListPivot(y, !IsOpen))
+                    // remarks : a "real" yakuman is better than a kazoe yakuman, even if the latest has more fans
+                    .OrderByDescending(hyl => hyl.Yakuman)
+                    .ThenByDescending(hyl => hyl.TotalFansCount)
                     .ToList();
         }
 

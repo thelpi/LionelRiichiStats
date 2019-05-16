@@ -151,6 +151,15 @@ namespace MahjongDll {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The list should have at least one yaku and no Null value..
+        /// </summary>
+        internal static string InvalidYakusCountError {
+            get {
+                return ResourceManager.GetString("InvalidYakusCountError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The list of yakus should contains at least one element..
         /// </summary>
         internal static string InvalidYakusListError {
