@@ -85,5 +85,28 @@ namespace MahjongDll.Pivot
             picks.Sort();
             return picks;
         }
+
+        /// <summary>
+        /// Computes tiles of the instance not included in the specified hand.
+        /// </summary>
+        /// <param name="handTiles">List of <see cref="TilePivot"/> in the hand.</param>
+        /// <param name="unique"><c>True</c> to remove duplicates from the output.</param>
+        /// <returns>List of remaining <see cref="TilePivot"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="handTiles"/></exception>
+        public List<TilePivot> ComputeRemainingTiles(List<TilePivot> handTiles, bool unique)
+        {
+            if (handTiles == null)
+            {
+                throw new ArgumentNullException(nameof(handTiles));
+            }
+
+            List<TilePivot> tiles = new List<TilePivot>(Tiles);
+            foreach (TilePivot tile in handTiles)
+            {
+                tiles.RemoveAt(tiles.LastIndexOf(tile));
+            }
+
+            return unique ? tiles.Distinct().ToList() : tiles;
+        }
     }
 }

@@ -48,11 +48,6 @@ namespace MahjongHandAnalyzer
                 handTiles.Add(GetCombo(i).SelectedItem as TilePivot);
             }
 
-            FullHandPivot hand = new FullHandPivot(handTiles,
-                CbbWindDominant.SelectedIndex > -1 ? (WindPivot)CbbWindDominant.SelectedItem : WindPivot.East,
-                CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
-                false);
-
             List<YakuPivot> yakusList = null;
             int iteration = 0;
             List<Tuple<TilePivot, TilePivot>> substitutions = new List<Tuple<TilePivot, TilePivot>>();
@@ -60,12 +55,43 @@ namespace MahjongHandAnalyzer
             {
                 if (iteration == 0)
                 {
-                    List<List<YakuPivot>> yakusListList = hand.ComputeHandYakus();
-                    yakusList = yakusListList?.First();
+                    FullHandPivot hand = new FullHandPivot(handTiles,
+                        CbbWindDominant.SelectedIndex > -1 ? (WindPivot)CbbWindDominant.SelectedItem : WindPivot.East,
+                        CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
+                        false);
+                    yakusList = hand.ComputeHandYakus()?.FirstOrDefault();
+                }
+                else if (iteration == 1)
+                {
+                    List<TilePivot> availableTiles = _draw.ComputeRemainingTiles(handTiles, true);
+                    foreach (TilePivot subbedTile in handTiles.Distinct())
+                    {
+                        foreach (TilePivot subTile in availableTiles)
+                        {
+                            Tuple<TilePivot, TilePivot> substitution = new Tuple<TilePivot, TilePivot>(subbedTile, subTile);
+                            List<TilePivot> handTilesWithSub = new List<TilePivot>(handTiles);
+                            handTilesWithSub.Remove(substitution.Item1);
+                            handTilesWithSub.Add(substitution.Item2);
+
+                            FullHandPivot hand = new FullHandPivot(handTilesWithSub,
+                                CbbWindDominant.SelectedIndex > -1 ? (WindPivot)CbbWindDominant.SelectedItem : WindPivot.East,
+                                CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
+                                false);
+
+                            List<YakuPivot> tempBestYakusList = hand.ComputeHandYakus()?.FirstOrDefault();
+                            if (tempBestYakusList != null && (yakusList == null || tempBestYakusList.Sum(x => x.FansConcealed) > yakusList?.Sum(x => x.FansConcealed)))
+                            {
+                                yakusList = tempBestYakusList;
+                                substitutions.Clear();
+                                substitutions.Add(substitution);
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    for (int j = 0; j < iteration; j++)
+                    throw new NotImplementedException();
+                    /*for (int j = 0; j < iteration; j++)
                     {
                         List<YakuPivot> tempBestYakusList = null;
 
@@ -73,11 +99,12 @@ namespace MahjongHandAnalyzer
                         {
                             yakusList = tempBestYakusList;
                         }
-                    }
+                    }*/
                 }
                 iteration++;
             }
             while (yakusList?.Any() != true);
+
             if (substitutions != null)
             {
                 TextBlock subTb = new TextBlock

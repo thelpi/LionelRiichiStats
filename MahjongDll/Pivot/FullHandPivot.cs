@@ -224,19 +224,6 @@ namespace MahjongDll.Pivot
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hand"></param>
-        /// <param name="substitutions"></param>
-        /// <returns></returns>
-        public static FullHandPivot FromHand(FullHandPivot hand, Tuple<TilePivot, TilePivot>[] substitutions)
-        {
-            List<TilePivot> tiles = hand.AllTiles.ToList();
-            // subs
-            return new FullHandPivot(tiles, hand.DominantWind, hand.TurnWind, hand.IsInitialDraw);
-        }
-
-        /// <summary>
         /// Computes every yakus extractible from the current hand.
         /// </summary>
         /// <returns>
@@ -547,6 +534,7 @@ namespace MahjongDll.Pivot
         private List<List<SetPivot>> ComputeValidCombinations()
         {
             List<List<SetPivot>> listOf_FourthSetsAndAPair = new List<List<SetPivot>>();
+            bool failAnyway = false;
 
             // Treats each family of tiles (dragon, wind, bamboo...) and begins with dragons and winds (do not change the OrderBy).
             foreach (var family in UnsetTiles.GroupBy(t => t.Family).OrderByDescending(t => (int)t.Key))
@@ -559,6 +547,7 @@ namespace MahjongDll.Pivot
                         {
                             if (!TryExtractSetsFromWindOrDragonFamily(setsOfDragons, dragon.ToList()))
                             {
+                                failAnyway = true;
                                 goto exitloop;
                             }
                         }
@@ -570,6 +559,7 @@ namespace MahjongDll.Pivot
                         {
                             if (!TryExtractSetsFromWindOrDragonFamily(setsOfWinds, wind.ToList()))
                             {
+                                failAnyway = true;
                                 goto exitloop;
                             }
                         }
@@ -578,6 +568,7 @@ namespace MahjongDll.Pivot
                     default:
                         if (_forbiddenCounts.Contains(family.Count()))
                         {
+                            failAnyway = true;
                             goto exitloop;
                         }
 
@@ -592,6 +583,7 @@ namespace MahjongDll.Pivot
                             // If, by doing so, we remove all the sets list, then we have to stop completely.
                             if (listOf_FourthSetsAndAPair.Count == 0)
                             {
+                                failAnyway = true;
                                 goto exitloop;
                             }
                         }
@@ -609,6 +601,7 @@ namespace MahjongDll.Pivot
 
                         if (setsForEachTile.Count == 0)
                         {
+                            failAnyway = true;
                             goto exitloop;
                         }
 
@@ -623,6 +616,11 @@ namespace MahjongDll.Pivot
                 }
             }
             exitloop:
+
+            if (failAnyway)
+            {
+                listOf_FourthSetsAndAPair.Clear();
+            }
 
             listOf_FourthSetsAndAPair.ForEach(sets =>
             {
