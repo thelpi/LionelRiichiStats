@@ -25,9 +25,9 @@ namespace MahjongDll.Pivot
         /// </summary>
         public WindPivot DominantWind { get; private set; }
         /// <summary>
-        /// Turn <see cref="WindPivot"/> for the player of the hand.
+        /// Seat <see cref="WindPivot"/> for the player of the hand.
         /// </summary>
-        public WindPivot TurnWind { get; private set; }
+        public WindPivot SeatWind { get; private set; }
         /// <summary>
         /// List of opened <see cref="SetPivot"/>.
         /// </summary>
@@ -126,7 +126,7 @@ namespace MahjongDll.Pivot
         /// </summary>
         /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
         /// <param name="dominantWind"><see cref="DominantWind"/>.</param>
-        /// <param name="turnWind"><see cref="TurnWind"/>.</param>
+        /// <param name="seatWind"><see cref="SeatWind"/>.</param>
         /// <param name="lastTile"><see cref="LastTile"/>.</param>
         /// <param name="isRon">Optionnal ; <see cref="IsRon"/>.</param>
         /// <param name="openedSets">Optionnal ; <see cref="OpenedSets"/>.</param>
@@ -139,7 +139,7 @@ namespace MahjongDll.Pivot
         /// <param name="isChankan">Optionnal ; <see cref="IsChankan"/>.</param>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidHandArgumentsConsistencyError"/>.</exception>
-        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot turnWind, TilePivot lastTile, bool isRon = false,
+        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot seatWind, TilePivot lastTile, bool isRon = false,
             List<SetPivot> openedSets = null, List<SetPivot> concealedKans = null,
             bool isRiichi = false, bool isDoubleRiichi = false, bool isIppatsu = false, bool isHaitei = false,
             bool isRinshankaihou = false, bool isChankan = false)
@@ -185,7 +185,7 @@ namespace MahjongDll.Pivot
 
             ConcealedTiles = tiles.OrderBy(t => t).ToList();
             DominantWind = dominantWind;
-            TurnWind = turnWind;
+            SeatWind = seatWind;
             LastTile = lastTile ?? throw new ArgumentNullException(nameof(lastTile));
             IsRon = isRon;
             OpenedSets = openedSets;
@@ -203,10 +203,10 @@ namespace MahjongDll.Pivot
         /// </summary>
         /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
         /// <param name="dominantWind"><see cref="DominantWind"/>.</param>
-        /// <param name="turnWind"><see cref="TurnWind"/>.</param>
+        /// <param name="seatWind"><see cref="SeatWind"/>.</param>
         /// <param name="isInitialDraw"><see cref="IsInitialDraw"/>.</param>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
-        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot turnWind, bool isInitialDraw = true)
+        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot seatWind, bool isInitialDraw = true)
         {
             tiles = tiles ?? new List<TilePivot>();
 
@@ -217,7 +217,7 @@ namespace MahjongDll.Pivot
 
             ConcealedTiles = tiles.OrderBy(t => t).ToList();
             DominantWind = dominantWind;
-            TurnWind = turnWind;
+            SeatWind = seatWind;
             OpenedSets = new List<SetPivot>();
             ConcealedKans = new List<SetPivot>();
             IsInitialDraw = isInitialDraw;
@@ -303,7 +303,7 @@ namespace MahjongDll.Pivot
                                     validCombination = currentCombo.All(c => c.IsTerminal || c.IsTerminalChi);
                                     break;
                                 case YakuPivot.Pinfu:
-                                    validCombination = currentCombo.All(c => c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != TurnWind && c.Wind != DominantWind))
+                                    validCombination = currentCombo.All(c => c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != SeatWind && c.Wind != DominantWind))
                                         && currentCombo.Any(c => c.IsChi && (c.Tiles.ElementAt(0).Equals(LastTile) || c.Tiles.ElementAt(2).Equals(LastTile)));
                                     break;
                                 case YakuPivot.Ryanpeikou:
@@ -353,7 +353,7 @@ namespace MahjongDll.Pivot
                                     break;
                                 case YakuPivot.Yakuhai:
                                     yakuCumul = currentCombo.Count(c => c.IsPonOrKan && c.IsDragon);
-                                    yakuCumul += currentCombo.Count(c => c.IsPonOrKan && c.Wind == TurnWind);
+                                    yakuCumul += currentCombo.Count(c => c.IsPonOrKan && c.Wind == SeatWind);
                                     yakuCumul += currentCombo.Count(c => c.IsPonOrKan && c.Wind == DominantWind);
                                     validCombination = yakuCumul > 0;
                                     break;
@@ -425,7 +425,7 @@ namespace MahjongDll.Pivot
                         isIn = IsChankan;
                         break;
                     case YakuPivot.Chiihou:
-                        isIn = IsInitialDraw && TurnWind != WindPivot.East;
+                        isIn = IsInitialDraw && SeatWind != WindPivot.East;
                         break;
                     case YakuPivot.DoubleRiichi:
                         isIn = IsDoubleRiichi;
@@ -443,7 +443,7 @@ namespace MahjongDll.Pivot
                         isIn = IsRinshankaihou;
                         break;
                     case YakuPivot.Tenhou:
-                        isIn = IsInitialDraw && TurnWind == WindPivot.East;
+                        isIn = IsInitialDraw && SeatWind == WindPivot.East;
                         break;
                 }
                 if (isIn)

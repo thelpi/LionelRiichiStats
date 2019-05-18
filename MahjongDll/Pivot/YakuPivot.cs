@@ -127,7 +127,7 @@ namespace MahjongDll.Pivot
                 FansConcealed = 1,
                 FansOpen = 1,
                 Name = Yakuhai,
-                Description = "Pon or kan of dragons, turn wind or dominant wind."
+                Description = "Pon or kan of dragons, seat wind or dominant wind."
             });
             _yakus.Add(new YakuPivot
             {

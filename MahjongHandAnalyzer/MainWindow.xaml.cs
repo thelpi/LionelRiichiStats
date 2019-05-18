@@ -27,10 +27,10 @@ namespace MahjongHandAnalyzer
             {
                 GetCombo(i).ItemsSource = _draw.UniqueTiles;
             }
-            CbbWindDominant.ItemsSource = Enum.GetValues(typeof(WindPivot));
-            CbbWindDominant.SelectedIndex = 0;
-            CbbWindTurn.ItemsSource = Enum.GetValues(typeof(WindPivot));
-            CbbWindTurn.SelectedIndex = 0;
+            CbbDominantWind.ItemsSource = Enum.GetValues(typeof(WindPivot));
+            CbbDominantWind.SelectedIndex = 0;
+            CbbSeatWind.ItemsSource = Enum.GetValues(typeof(WindPivot));
+            CbbSeatWind.SelectedIndex = 0;
         }
 
         #region Actions
@@ -56,8 +56,8 @@ namespace MahjongHandAnalyzer
                 if (iteration == 0)
                 {
                     FullHandPivot hand = new FullHandPivot(handTiles,
-                        CbbWindDominant.SelectedIndex > -1 ? (WindPivot)CbbWindDominant.SelectedItem : WindPivot.East,
-                        CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
+                        CbbDominantWind.SelectedIndex > -1 ? (WindPivot)CbbDominantWind.SelectedItem : WindPivot.East,
+                        CbbSeatWind.SelectedIndex > -1 ? (WindPivot)CbbSeatWind.SelectedItem : WindPivot.East,
                         false);
                     handYakus = hand.ComputeHandYakus()?.FirstOrDefault();
                 }
@@ -74,8 +74,8 @@ namespace MahjongHandAnalyzer
                             handTilesWithSub.Add(substitution.Item2);
 
                             FullHandPivot hand = new FullHandPivot(handTilesWithSub,
-                                CbbWindDominant.SelectedIndex > -1 ? (WindPivot)CbbWindDominant.SelectedItem : WindPivot.East,
-                                CbbWindTurn.SelectedIndex > -1 ? (WindPivot)CbbWindTurn.SelectedItem : WindPivot.East,
+                                CbbDominantWind.SelectedIndex > -1 ? (WindPivot)CbbDominantWind.SelectedItem : WindPivot.East,
+                                CbbSeatWind.SelectedIndex > -1 ? (WindPivot)CbbSeatWind.SelectedItem : WindPivot.East,
                                 false);
 
                             HandYakuListPivot tempBestYakusList = hand.ComputeHandYakus()?.FirstOrDefault();
