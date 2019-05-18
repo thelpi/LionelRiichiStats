@@ -201,10 +201,17 @@ namespace MahjongDll.Pivot
         /// Gets a <see cref="string"/> representation of the tile.
         /// </summary>
         /// <returns><see cref="String"/> which represents the tile.</returns>
-        public override string ToString() =>
-            string.Format("{0} - {1}", Family,
-                IsWind ? Wind.Value.ToString() :
-                    (IsDragon ? Dragon.Value.ToString() :
-                        Number.ToString()));
+        public override string ToString()
+        {
+            switch (Family)
+            {
+                case FamilyPivot.Dragon:
+                    return $"{Dragon.Value}-{Family}";
+                case FamilyPivot.Wind:
+                    return $"{Wind.Value}-{Family}";
+                default:
+                    return $"{Number}-{Family}";
+            }
+        }
     }
 }

@@ -162,7 +162,11 @@
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Results" DockPanel.Dock="Bottom" Padding="5" Name="GrbResults">
-            <!-- fill by code-behind -->
+            <TabControl>
+                <TabItem Header="0 changes" Name="Tbi0" IsSelected="True" />
+                <TabItem Header="1 changes" Name="Tbi1" />
+                <TabItem Header="2 changes" Name="Tbi2" />
+            </TabControl>
         </GroupBox>
     </DockPanel>
 </Window>

@@ -7,7 +7,8 @@ namespace MahjongDll.Pivot
     /// <summary>
     /// Represents a list of <see cref="YakuPivot"/> in a hand.
     /// </summary>
-    public class HandYakuListPivot
+    /// <seealso cref="IEquatable{T}"/>
+    public class HandYakuListPivot : IEquatable<HandYakuListPivot>
     {
         #region Embedded properties
 
@@ -56,21 +57,21 @@ namespace MahjongDll.Pivot
                 switch (OfficialFansCount)
                 {
                     case 13:
-                        return "Yakuman";
+                        return $"Yakuman ({TotalFansCount} fans)";
                     case 12:
                     case 11:
-                        return "Sanbaiman";
+                        return $"Sanbaiman ({TotalFansCount} fans)";
                     case 10:
                     case 09:
                     case 08:
-                        return "Baiman";
+                        return $"Baiman ({TotalFansCount} fans)";
                     case 07:
                     case 06:
-                        return "Haneman";
+                        return $"Haneman ({TotalFansCount} fans)";
                     case 05:
-                        return "Mangan";
+                        return $"Mangan ({TotalFansCount} fans)";
                     default:
-                        return string.Empty;
+                        return $"{TotalFansCount} fans";
                 }
             }
         }
@@ -98,6 +99,18 @@ namespace MahjongDll.Pivot
 
             _yakus = new List<YakuPivot>(yakus);
             ConcealedHand = concealedHand;
+        }
+
+        /// <summary>
+        /// Checks if this instance is equal to another one.
+        /// </summary>
+        /// <param name="other">Second instance of <see cref="HandYakuListPivot"/>.</param>
+        /// <returns><c>True</c> if equal; <c>False</c> otherwise.</returns>
+        public bool Equals(HandYakuListPivot other)
+        {
+            return other?.ConcealedHand == ConcealedHand
+                && other.Yakus.Count == Yakus.Count
+                && other.Yakus.All(y => Yakus.Contains(y));
         }
     }
 }

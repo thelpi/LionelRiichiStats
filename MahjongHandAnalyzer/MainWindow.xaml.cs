@@ -39,53 +39,126 @@ namespace MahjongHandAnalyzer
 
         private void BtnAnalyze_Click(object sender, RoutedEventArgs e)
         {
-            ExtractFromForm(out List<TilePivot> handTiles, out TilePivot latestTile, out WindPivot dominantWind, out WindPivot seatWind);
-
-            /*
-            HandYakuListPivot handYakus = null;
-            int iteration = 0;
-            List<Tuple<TilePivot, TilePivot>> substitutions = new List<Tuple<TilePivot, TilePivot>>();
-            do
+            if (!ExtractFromForm(out List<TilePivot> handTiles, out TilePivot latestTile, out WindPivot dominantWind, out WindPivot seatWind))
             {
-                if (iteration == 0)
+                return;
+            }
+
+            #region 0 tile
+
+            FullHandPivot hand = new FullHandPivot(handTiles, dominantWind, seatWind, latestTile);
+            HandYakuListPivot handYakus = hand.ComputeHandYakus()?.FirstOrDefault();
+            SetContentFromHandListYaku(Tbi0, handYakus);
+
+            #endregion 0 tile
+
+            #region 1 tile
+
+            // gets yakus for each substitution combination
+            var rawResults = new List<Tuple<TilePivot, TilePivot, HandYakuListPivot>>();
+            var alreadyDone = new List<Tuple<TilePivot, TilePivot>>();
+            var handTileWithLast = new List<TilePivot>(handTiles)
+            {
+                latestTile
+            };
+            List<TilePivot> availableTiles = _draw.ComputeRemainingTiles(handTileWithLast, true);
+            foreach (TilePivot subbedTile in handTileWithLast.Distinct())
+            {
+                foreach (TilePivot subTile in availableTiles)
                 {
-                    FullHandPivot hand = new FullHandPivot(handTiles, dominantWind, seatWind, latestTile);
-                    handYakus = hand.ComputeHandYakus()?.FirstOrDefault();
-                }
-                else if (iteration == 1)
-                {
-                    List<TilePivot> availableTiles = _draw.ComputeRemainingTiles(handTiles, true);
-                    foreach (TilePivot subbedTile in handTiles.Distinct())
+                    if (subbedTile.Equals(subTile)
+                        && !alreadyDone.Any(_ => _.Item1 == subbedTile && _.Item2 == subTile))
                     {
-                        foreach (TilePivot subTile in availableTiles)
-                        {
-                            Tuple<TilePivot, TilePivot> substitution = new Tuple<TilePivot, TilePivot>(subbedTile, subTile);
-                            List<TilePivot> handTilesWithSub = new List<TilePivot>(handTiles);
-                            handTilesWithSub.Remove(substitution.Item1);
-                            handTilesWithSub.Add(substitution.Item2);
+                        continue;
+                    }
+                    alreadyDone.Add(new Tuple<TilePivot, TilePivot>(subbedTile, subTile));
 
-                            FullHandPivot hand = new FullHandPivot(handTilesWithSub,
-                                dominantWind,
-                                seatWind,
-                                false);
+                    List<TilePivot> handTilesWithSub = new List<TilePivot>(handTileWithLast);
+                    handTilesWithSub.Remove(subbedTile);
 
-                            HandYakuListPivot tempBestYakusList = hand.ComputeHandYakus()?.FirstOrDefault();
-                            if (tempBestYakusList != null && (handYakus == null || tempBestYakusList.OfficialFansCount > handYakus.OfficialFansCount))
-                            {
-                                handYakus = tempBestYakusList;
-                                substitutions.Clear();
-                                substitutions.Add(substitution);
-                            }
-                        }
+                    hand = new FullHandPivot(handTilesWithSub, dominantWind, seatWind, subTile);
+
+                    HandYakuListPivot tmpResults = hand.ComputeHandYakus()?.FirstOrDefault();
+                    if (tmpResults != null)
+                    {
+                        rawResults.Add(new Tuple<TilePivot, TilePivot, HandYakuListPivot>(subbedTile, subTile, tmpResults));
                     }
                 }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-                iteration++;
             }
-            while (handYakus == null);*/
+
+            // flats the raw results
+            var groupResults = new Dictionary<HandYakuListPivot, List<Tuple<TilePivot, TilePivot>>>();
+            foreach (var rawResult in rawResults)
+            {
+                var key = groupResults.Keys.FirstOrDefault(k => k.Equals(rawResult.Item3));
+                if (key == null)
+                {
+                    key = rawResult.Item3;
+                    groupResults.Add(key, new List<Tuple<TilePivot, TilePivot>>());
+                }
+                groupResults[key].Add(new Tuple<TilePivot, TilePivot>(rawResult.Item1, rawResult.Item2));
+            }
+
+            // computes the probability of each HandYakuListPivot
+            var resultsWithProb = new Dictionary<HandYakuListPivot, Tuple<double, List<Tuple<TilePivot, TilePivot>>>>();
+            foreach (var key in groupResults.Keys)
+            {
+                var prob = groupResults[key].Sum(x => availableTiles.Count(_ => _.Equals(x.Item2)));
+                resultsWithProb.Add(key, new Tuple<double, List<Tuple<TilePivot, TilePivot>>>(prob / (double)availableTiles.Count, groupResults[key]));
+            }
+
+            // displays ordered results
+            var orderedRes = resultsWithProb
+                                .OrderByDescending(x => x.Value.Item1)
+                                .ToDictionary(x => x.Key, x => x.Value);
+            int i = 0;
+            StackPanel spSolutions = new StackPanel { Orientation = Orientation.Horizontal };
+            spSolutions.SetValue(DockPanel.DockProperty, Dock.Top);
+            foreach (var key in orderedRes.Keys)
+            {
+                i++;
+                GroupBox gbSingle = new GroupBox { Header = $"Solution {i}" };
+                SetContentFromHandListYaku(gbSingle, key, orderedRes[key].Item1, orderedRes[key].Item2);
+                spSolutions.Children.Add(gbSingle);
+            }
+
+            // per discard solutions
+            StackPanel spPerDiscard = new StackPanel { Orientation = Orientation.Vertical };
+
+            var discardprobabilities = new Dictionary<TilePivot, double>();
+            TilePivot currentDiscard = null;
+            double probability = 0;
+            foreach (var r in rawResults.OrderBy(x => x.Item1))
+            {
+                if (currentDiscard != null && !r.Item1.Equals(currentDiscard))
+                {
+                    discardprobabilities.Add(currentDiscard, Math.Round(probability * 100, 3));
+                    probability = 0;
+                }
+                currentDiscard = r.Item1;
+                probability += availableTiles.Count(_ => _.Equals(currentDiscard)) / (double)availableTiles.Count;
+            }
+            discardprobabilities.Add(currentDiscard, Math.Round(probability * 100, 3));
+
+            foreach (var discardprobability in discardprobabilities.OrderByDescending(x => x.Value))
+            {
+                spPerDiscard.Children.Add(new TextBlock
+                {
+                    Text = $"{discardprobability.Key} with a prob. of {discardprobability.Value} %"
+                });
+            }
+
+            GroupBox gbPerDiscard = new GroupBox { Header = "Win prob. per discard", Content = spPerDiscard };
+            gbPerDiscard.SetValue(DockPanel.DockProperty, Dock.Bottom);
+
+            DockPanel fullResults = new DockPanel();
+            fullResults.Children.Add(gbPerDiscard);
+            fullResults.Children.Add(spSolutions);
+            Tbi1.Content = fullResults;
+
+            #endregion 1 tile
+
+            GrbResults.Visibility = Visibility.Visible;
         }
 
         private void BtnRandomize_Click(object sender, RoutedEventArgs e)
@@ -128,7 +201,10 @@ namespace MahjongHandAnalyzer
             CbbDominantWind.SelectedIndex = 0;
             CbbSeatWind.SelectedIndex = 0;
             GrbResults.Visibility = Visibility.Collapsed;
-            GrbResults.Content = null;
+            Tbi0.IsSelected = true;
+            Tbi0.Content = null;
+            Tbi1.Content = null;
+            Tbi2.Content = null;
         }
 
         private bool ExtractFromForm(out List<TilePivot> tiles, out TilePivot latestPickTile, out WindPivot dominantWind, out WindPivot seatWind)
@@ -160,6 +236,11 @@ namespace MahjongHandAnalyzer
                 MessageBox.Show("The latest tile has not been selected.", "LionelRiichiStats - Error");
                 return false;
             }
+            if (tiles.Concat(new List<TilePivot> { latestPickTile }).GroupBy(t => t).Any(tg => tg.Count() > 4))
+            {
+                MessageBox.Show("One tile is selected more than four times.", "LionelRiichiStats - Error");
+                return false;
+            }
             if (CbbDominantWind.SelectedIndex == -1)
             {
                 MessageBox.Show("The dominant wind has not been selected.", "LionelRiichiStats - Error");
@@ -174,6 +255,70 @@ namespace MahjongHandAnalyzer
             seatWind = (WindPivot)CbbSeatWind.SelectedItem;
 
             return true;
+        }
+
+        private void SetContentFromHandListYaku(ContentControl container, HandYakuListPivot handYakus, double probability = 1, List<Tuple<TilePivot, TilePivot>> substitutions = null)
+        {
+            if (handYakus == null)
+            {
+                container.Content = new TextBlock
+                {
+                    Text = "Shanten"
+                };
+            }
+            else
+            {
+                StackPanel sp = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                    Margin = new Thickness(5, 0, 0, 0)
+                };
+                sp.Children.Add(new TextBlock
+                {
+                    Text = handYakus.FansName,
+                    FontSize = 12,
+                    Foreground = System.Windows.Media.Brushes.Red
+                });
+                if (probability < 1)
+                {
+                    sp.Children.Add(new TextBlock
+                    {
+                        Text = $"Prob. of {Math.Round(probability * 100, 3)} %",
+                        FontSize = 12,
+                        Foreground = System.Windows.Media.Brushes.DarkSlateBlue
+                    });
+                }
+
+                StackPanel spYakus = new StackPanel { Orientation = Orientation.Vertical };
+                foreach (YakuPivot yaku in handYakus.Yakus)
+                {
+                    spYakus.Children.Add(new TextBlock
+                    {
+                        Text = $"{yaku.Name} ({yaku.FansConcealed})",
+                        ToolTip = yaku.Description
+                    });
+                }
+
+                GroupBox gbYakus = new GroupBox { Header = "Yakus", Content = spYakus };
+                sp.Children.Add(gbYakus);
+
+                if (substitutions != null)
+                {
+                    StackPanel spSubs = new StackPanel { Orientation = Orientation.Vertical };
+                    foreach (var sub in substitutions)
+                    {
+                        spSubs.Children.Add(new TextBlock
+                        {
+                            Text = $"Discard {sub.Item1}, pick {sub.Item2}"
+                        });
+                    }
+
+                    GroupBox gbSubs = new GroupBox { Header = "Potential discards & picks", Content = spSubs };
+                    sp.Children.Add(gbSubs);
+                }
+
+                container.Content = sp;
+            }
         }
     }
 }
