@@ -11,13 +11,15 @@ namespace MahjongDll.Pivot
     {
         #region Embedded properties
 
-        // Randomizer.
-        private Random _randomizer = new Random(DateTime.Now.Millisecond);
-
         /// <summary>
         /// List of <see cref="TilePivot"/>.
         /// </summary>
         public IReadOnlyCollection<TilePivot> Tiles { get; private set; }
+
+        /// <summary>
+        /// Randomizer.
+        /// </summary>
+        public Random Randomizer { get; } = new Random(DateTime.Now.Millisecond);
 
         #endregion Embedded properties
 
@@ -72,7 +74,7 @@ namespace MahjongDll.Pivot
                 bool added = false;
                 do
                 {
-                    int nextIndex = _randomizer.Next(0, Tiles.Count);
+                    int nextIndex = Randomizer.Next(0, Tiles.Count);
                     if (!indexes.Contains(nextIndex))
                     {
                         picks.Add(Tiles.ElementAt(nextIndex));

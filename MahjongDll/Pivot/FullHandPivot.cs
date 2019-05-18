@@ -33,9 +33,9 @@ namespace MahjongDll.Pivot
         /// </summary>
         public IReadOnlyCollection<SetPivot> OpenedSets { get; private set; }
         /// <summary>
-        /// Last <see cref="TilePivot"/> picked. Not included in <see cref="ConcealedTiles"/>.
+        /// Latest <see cref="TilePivot"/> picked. Not included in <see cref="ConcealedTiles"/>.
         /// </summary>
-        public TilePivot LastTile { get; private set; }
+        public TilePivot LatestTile { get; private set; }
         /// <summary>
         /// Closed kans.
         /// </summary>
@@ -95,9 +95,9 @@ namespace MahjongDll.Pivot
                 if (_unsetTiles == null)
                 {
                     List<TilePivot> tilesToAdd = new List<TilePivot>();
-                    if (LastTile != null)
+                    if (LatestTile != null)
                     {
-                        tilesToAdd.Add(LastTile);
+                        tilesToAdd.Add(LatestTile);
                     }
                     _unsetTiles = ConcealedTiles.Concat(tilesToAdd).ToList();
                     _unsetTiles.Sort();
@@ -127,22 +127,23 @@ namespace MahjongDll.Pivot
         /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
         /// <param name="dominantWind"><see cref="DominantWind"/>.</param>
         /// <param name="seatWind"><see cref="SeatWind"/>.</param>
-        /// <param name="lastTile"><see cref="LastTile"/>.</param>
-        /// <param name="isRon">Optionnal ; <see cref="IsRon"/>.</param>
-        /// <param name="openedSets">Optionnal ; <see cref="OpenedSets"/>.</param>
-        /// <param name="concealedKans">Optionnal ; <see cref="ConcealedKans"/>.</param>
-        /// <param name="isRiichi">Optionnal ; <see cref="IsRiichi"/>.</param>
-        /// <param name="isDoubleRiichi">Optionnal ; <see cref="IsDoubleRiichi"/>.</param>
-        /// <param name="isIppatsu">Optionnal ; <see cref="IsIppatsu"/>.</param>
-        /// <param name="isHaitei">Optionnal ; <see cref="IsHaitei"/>.</param>
+        /// <param name="latestTile"><see cref="LatestTile"/>.</param>
+        /// <param name="isRon">Optionnal; <see cref="IsRon"/>.</param>
+        /// <param name="openedSets">Optionnal; <see cref="OpenedSets"/>.</param>
+        /// <param name="concealedKans">Optionnal; <see cref="ConcealedKans"/>.</param>
+        /// <param name="isRiichi">Optionnal; <see cref="IsRiichi"/>.</param>
+        /// <param name="isDoubleRiichi">Optionnal; <see cref="IsDoubleRiichi"/>.</param>
+        /// <param name="isIppatsu">Optionnal; <see cref="IsIppatsu"/>.</param>
+        /// <param name="isHaitei">Optionnal; <see cref="IsHaitei"/>.</param>
         /// <param name="isRinshankaihou">Optionnal ; <see cref="IsRinshankaihou"/>.</param>
-        /// <param name="isChankan">Optionnal ; <see cref="IsChankan"/>.</param>
+        /// <param name="isChankan">Optionnal; <see cref="IsChankan"/>.</param>
+        /// <param name="isInitialDraw">Optionnal; <see cref="IsInitialDraw"/>.</param>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
         /// <exception cref="ArgumentException"><see cref="Messages.InvalidHandArgumentsConsistencyError"/>.</exception>
-        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot seatWind, TilePivot lastTile, bool isRon = false,
+        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot seatWind, TilePivot latestTile, bool isRon = false,
             List<SetPivot> openedSets = null, List<SetPivot> concealedKans = null,
             bool isRiichi = false, bool isDoubleRiichi = false, bool isIppatsu = false, bool isHaitei = false,
-            bool isRinshankaihou = false, bool isChankan = false)
+            bool isRinshankaihou = false, bool isChankan = false, bool isInitialDraw = false)
         {
             tiles = tiles ?? new List<TilePivot>();
             openedSets = openedSets ?? new List<SetPivot>();
@@ -183,10 +184,12 @@ namespace MahjongDll.Pivot
                 throw new ArgumentException(Messages.InvalidHandArgumentsConsistencyError, nameof(isIppatsu));
             }
 
+            // TODO : implement controls to prevent buggy initial draw
+
             ConcealedTiles = tiles.OrderBy(t => t).ToList();
             DominantWind = dominantWind;
             SeatWind = seatWind;
-            LastTile = lastTile ?? throw new ArgumentNullException(nameof(lastTile));
+            LatestTile = latestTile ?? throw new ArgumentNullException(nameof(latestTile));
             IsRon = isRon;
             OpenedSets = openedSets;
             ConcealedKans = concealedKans;
@@ -196,31 +199,7 @@ namespace MahjongDll.Pivot
             IsChankan = isChankan;
             IsHaitei = isHaitei;
             IsRinshankaihou = isRinshankaihou;
-        }
-
-        /// <summary>
-        /// Constructor specific to tenhou / chiihou.
-        /// </summary>
-        /// <param name="tiles"><see cref="ConcealedTiles"/>.</param>
-        /// <param name="dominantWind"><see cref="DominantWind"/>.</param>
-        /// <param name="seatWind"><see cref="SeatWind"/>.</param>
-        /// <param name="isInitialDraw"><see cref="IsInitialDraw"/>.</param>
-        /// <exception cref="ArgumentException"><see cref="Messages.InvalidTilesCountInHandError"/>.</exception>
-        public FullHandPivot(List<TilePivot> tiles, WindPivot dominantWind, WindPivot seatWind, bool isInitialDraw = true)
-        {
-            tiles = tiles ?? new List<TilePivot>();
-
-            if (tiles.Count != 14)
-            {
-                throw new ArgumentException(Messages.InvalidTilesCountInHandError);
-            }
-
-            ConcealedTiles = tiles.OrderBy(t => t).ToList();
-            DominantWind = dominantWind;
-            SeatWind = seatWind;
-            OpenedSets = new List<SetPivot>();
-            ConcealedKans = new List<SetPivot>();
-            IsInitialDraw = isInitialDraw;
+            IsInitialDraw = IsInitialDraw;
         }
 
         /// <summary>
@@ -304,7 +283,7 @@ namespace MahjongDll.Pivot
                                     break;
                                 case YakuPivot.Pinfu:
                                     validCombination = currentCombo.All(c => c.IsChi || (c.IsPair && !c.IsDragon && c.Wind != SeatWind && c.Wind != DominantWind))
-                                        && currentCombo.Any(c => c.IsChi && (c.Tiles.ElementAt(0).Equals(LastTile) || c.Tiles.ElementAt(2).Equals(LastTile)));
+                                        && currentCombo.Any(c => c.IsChi && (c.Tiles.ElementAt(0).Equals(LatestTile) || c.Tiles.ElementAt(2).Equals(LatestTile)));
                                     break;
                                 case YakuPivot.Ryanpeikou:
                                     validCombination = currentCombo.Where(c => c.IsChi).GroupBy(c => new { c.FirstNumber, c.Family }).Count(c => c.Count() >= 2) > 1
@@ -405,7 +384,7 @@ namespace MahjongDll.Pivot
         {
             return combo.Count(c => c.IsPonOrKan
                 && !OpenedSets.Contains(c)
-                && (!IsRon || !c.Tiles.Contains(LastTile))) == expectedCount;
+                && (!IsRon || !c.Tiles.Contains(LatestTile))) == expectedCount;
         }
 
         // Checks yakus that don't depend on tiles (assuming the hand is valid).
@@ -490,19 +469,19 @@ namespace MahjongDll.Pivot
         // Checks if the hand is Kokushi Musou.
         private bool IsKokushiMusou()
         {
-            if (ConcealedKans.Count > 0 || IsOpen || ConcealedTiles.Count < 14)
+            if (ConcealedKans.Count > 0 || IsOpen || UnsetTiles.Count < 14)
             {
                 return false;
             }
 
-            return ConcealedTiles.All(t => t.IsTerminalOrHonor)
+            return UnsetTiles.All(t => t.IsTerminalOrHonor)
                 // Doesn't contain a pon.
-                && !ConcealedTiles
+                && !UnsetTiles
                     .GroupBy(t => t)
                     .Select(grp => new KeyValuePair<TilePivot, int>(grp.Key, grp.Count()))
                     .Any(kvp => kvp.Value > 2)
                 // Contains a single pair.
-                && ConcealedTiles
+                && UnsetTiles
                     .GroupBy(t => t)
                     .Select(grp => new KeyValuePair<TilePivot, int>(grp.Key, grp.Count()))
                     .Count(kvp => kvp.Value == 2) == 1;

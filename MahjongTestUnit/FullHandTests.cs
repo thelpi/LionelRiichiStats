@@ -187,20 +187,18 @@ namespace MahjongTestUnit
                 new TilePivot(WindPivot.West),
                 new TilePivot(DragonPivot.Red),
                 new TilePivot(DragonPivot.Green),
-                new TilePivot(DragonPivot.White),
                 new TilePivot(DragonPivot.White)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.East, new TilePivot(DragonPivot.White));
 
             List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(2, groupsOfYakus[0].Yakus.Count);
-            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Tenhou)));
+            Assert.AreEqual(1, groupsOfYakus[0].Yakus.Count);
             Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.KokushiMusou)));
         }
 
@@ -221,20 +219,18 @@ namespace MahjongTestUnit
                 new TilePivot(FamilyPivot.Bamboo, 8),
                 new TilePivot(FamilyPivot.Bamboo, 9),
                 new TilePivot(FamilyPivot.Bamboo, 9),
-                new TilePivot(FamilyPivot.Bamboo, 9),
-                new TilePivot(FamilyPivot.Bamboo, 3)
+                new TilePivot(FamilyPivot.Bamboo, 9)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North, new TilePivot(FamilyPivot.Bamboo, 3));
 
             List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 
             Assert.IsNotNull(groupsOfYakus);
             Assert.AreEqual(1, groupsOfYakus.Count);
             Assert.IsNotNull(groupsOfYakus[0]);
-            Assert.AreEqual(2, groupsOfYakus[0].Yakus.Count);
-            Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.Chiihou)));
+            Assert.AreEqual(1, groupsOfYakus[0].Yakus.Count);
             Assert.IsTrue(groupsOfYakus[0].Yakus.Contains(YakuPivot.Get(YakuPivot.ChuurenPoutou)));
         }
 
@@ -293,12 +289,11 @@ namespace MahjongTestUnit
                 new TilePivot(FamilyPivot.Character, 9),
                 new TilePivot(WindPivot.North),
                 new TilePivot(DragonPivot.Red),
-                new TilePivot(DragonPivot.Red),
-                new TilePivot(FamilyPivot.Character, 1)
+                new TilePivot(DragonPivot.Red)
             };
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
-            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North);
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North, new TilePivot(FamilyPivot.Character, 1));
 
             List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 

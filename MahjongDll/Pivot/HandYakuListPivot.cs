@@ -46,6 +46,35 @@ namespace MahjongDll.Pivot
         /// </summary>
         public bool Yakuman { get { return _yakus.Any(y => y.Yakuman); } }
 
+        /// <summary>
+        /// Name of the hand by its fans number.
+        /// </summary>
+        public string FansName
+        {
+            get
+            {
+                switch (OfficialFansCount)
+                {
+                    case 13:
+                        return "Yakuman";
+                    case 12:
+                    case 11:
+                        return "Sanbaiman";
+                    case 10:
+                    case 09:
+                    case 08:
+                        return "Baiman";
+                    case 07:
+                    case 06:
+                        return "Haneman";
+                    case 05:
+                        return "Mangan";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+
         #endregion
 
         /// <summary>

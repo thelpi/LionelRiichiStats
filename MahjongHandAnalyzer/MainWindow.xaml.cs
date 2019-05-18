@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using MahjongDll.Pivot;
-using System;
-using System.Linq;
 
 namespace MahjongHandAnalyzer
 {
@@ -20,34 +20,28 @@ namespace MahjongHandAnalyzer
         public MainWindow()
         {
             InitializeComponent();
-            GrbYakus.Visibility = Visibility.Collapsed;
 
             _draw = new DrawPivot();
+
             for (int i = 1; i <= 14; i++)
             {
                 GetCombo(i).ItemsSource = _draw.UniqueTiles;
             }
-            CbbDominantWind.ItemsSource = Enum.GetValues(typeof(WindPivot));
-            CbbDominantWind.SelectedIndex = 0;
-            CbbSeatWind.ItemsSource = Enum.GetValues(typeof(WindPivot));
-            CbbSeatWind.SelectedIndex = 0;
+
+            IEnumerable<WindPivot> winds = Enum.GetValues(typeof(WindPivot)).OfType<WindPivot>();
+            CbbDominantWind.ItemsSource = winds.Take(2);
+            CbbSeatWind.ItemsSource = winds;
+
+            ResetForm();
         }
 
         #region Actions
 
         private void BtnAnalyze_Click(object sender, RoutedEventArgs e)
         {
-            List<TilePivot> handTiles = new List<TilePivot>();
-            for (int i = 1; i <= 14; i++)
-            {
-                if (GetCombo(i).SelectedItem == null)
-                {
-                    MessageBox.Show("Some slots are empty.", "LionelRiichiStats - Error");
-                    return;
-                }
-                handTiles.Add(GetCombo(i).SelectedItem as TilePivot);
-            }
+            ExtractFromForm(out List<TilePivot> handTiles, out TilePivot latestTile, out WindPivot dominantWind, out WindPivot seatWind);
 
+            /*
             HandYakuListPivot handYakus = null;
             int iteration = 0;
             List<Tuple<TilePivot, TilePivot>> substitutions = new List<Tuple<TilePivot, TilePivot>>();
@@ -55,10 +49,7 @@ namespace MahjongHandAnalyzer
             {
                 if (iteration == 0)
                 {
-                    FullHandPivot hand = new FullHandPivot(handTiles,
-                        CbbDominantWind.SelectedIndex > -1 ? (WindPivot)CbbDominantWind.SelectedItem : WindPivot.East,
-                        CbbSeatWind.SelectedIndex > -1 ? (WindPivot)CbbSeatWind.SelectedItem : WindPivot.East,
-                        false);
+                    FullHandPivot hand = new FullHandPivot(handTiles, dominantWind, seatWind, latestTile);
                     handYakus = hand.ComputeHandYakus()?.FirstOrDefault();
                 }
                 else if (iteration == 1)
@@ -74,8 +65,8 @@ namespace MahjongHandAnalyzer
                             handTilesWithSub.Add(substitution.Item2);
 
                             FullHandPivot hand = new FullHandPivot(handTilesWithSub,
-                                CbbDominantWind.SelectedIndex > -1 ? (WindPivot)CbbDominantWind.SelectedItem : WindPivot.East,
-                                CbbSeatWind.SelectedIndex > -1 ? (WindPivot)CbbSeatWind.SelectedItem : WindPivot.East,
+                                dominantWind,
+                                seatWind,
                                 false);
 
                             HandYakuListPivot tempBestYakusList = hand.ComputeHandYakus()?.FirstOrDefault();
@@ -91,102 +82,28 @@ namespace MahjongHandAnalyzer
                 else
                 {
                     throw new NotImplementedException();
-                    /*for (int j = 0; j < iteration; j++)
-                    {
-                        List<YakuPivot> tempBestYakusList = null;
-
-                        if (tempBestYakusList != null && tempBestYakusList.Sum(x => x.FansConcealed) > yakusList?.Sum(x => x.FansConcealed))
-                        {
-                            yakusList = tempBestYakusList;
-                        }
-                    }*/
                 }
                 iteration++;
             }
-            while (handYakus == null);
-
-            if (substitutions != null)
-            {
-                TextBlock subTb = new TextBlock
-                {
-                    Text = string.Format("Substitutions ({0}) : {1}",
-                        substitutions.Count,
-                        string.Join(", ", substitutions.Select(x => $"[{x.Item1.ToString()}] to [{x.Item2.ToString()}]"))),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 12,
-                    Foreground = System.Windows.Media.Brushes.Red
-                };
-                StpYakus.Children.Add(subTb);
-            }
-
-            foreach (YakuPivot yaku in handYakus.Yakus)
-            {
-                TextBlock tb = new TextBlock
-                {
-                    Text = $"{yaku.Name} ({yaku.FansConcealed} fans)",
-                    VerticalAlignment = VerticalAlignment.Center,
-                    ToolTip = yaku.Description
-                };
-                StpYakus.Children.Add(tb);
-            }
-            string fansLabel = string.Empty;
-            if (handYakus.Yakuman)
-            {
-                fansLabel = $"Yakuman";
-            }
-            else
-            {
-                switch (handYakus.OfficialFansCount)
-                {
-                    case 12:
-                    case 11:
-                        fansLabel = $"Sanbaiman ({handYakus.OfficialFansCount} fans)";
-                        break;
-                    case 10:
-                    case 9:
-                    case 8:
-                        fansLabel = $"Baiman ({handYakus.OfficialFansCount} fans)";
-                        break;
-                    case 7:
-                    case 6:
-                        fansLabel = $"Haneman ({handYakus.OfficialFansCount} fans)";
-                        break;
-                    case 5:
-                        fansLabel = $"Mangan ({handYakus.OfficialFansCount} fans)";
-                        break;
-                    default:
-                        fansLabel = $"Total : {handYakus.OfficialFansCount} fans";
-                        break;
-                }
-            }
-
-            TextBlock tbLast = new TextBlock
-            {
-                Text = fansLabel,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontSize = 12,
-                Foreground = System.Windows.Media.Brushes.Red
-            };
-            StpYakus.Children.Add(tbLast);
-
-            GrbYakus.Visibility = Visibility.Visible;
+            while (handYakus == null);*/
         }
 
         private void BtnRandomize_Click(object sender, RoutedEventArgs e)
         {
-            List<TilePivot> toto = _draw.PickHandOfTiles().ToList();
+            List<TilePivot> handTiles = _draw.PickHandOfTiles().ToList();
+            int indexOfLastPick = _draw.Randomizer.Next(1, 15);
             for (int i = 1; i <= 14; i++)
             {
-                GetCombo(i).SelectedItem = toto[i - 1];
+                GetCombo(i).SelectedItem = handTiles[i - 1];
+                GetRadio(i).IsChecked = indexOfLastPick == i;
             }
+            CbbDominantWind.SelectedIndex = _draw.Randomizer.Next(0, 2);
+            CbbSeatWind.SelectedIndex = _draw.Randomizer.Next(0, 4);
         }
 
         private void BtnClear_Click(object sender, RoutedEventArgs e)
         {
-            for (int i = 1; i <= 14; i++)
-            {
-                GetCombo(i).SelectedIndex = -1;
-            }
+            ResetForm();
         }
 
         #endregion Actions
@@ -194,6 +111,69 @@ namespace MahjongHandAnalyzer
         private ComboBox GetCombo(int i)
         {
             return FindName(string.Format("CbbTile{0}", (i < 10 ? "0" : "") + i.ToString())) as ComboBox;
+        }
+
+        private RadioButton GetRadio(int i)
+        {
+            return FindName(string.Format("RdbLastPick{0}", (i < 10 ? "0" : "") + i.ToString())) as RadioButton;
+        }
+
+        private void ResetForm()
+        {
+            for (int i = 1; i <= 14; i++)
+            {
+                GetCombo(i).SelectedIndex = -1;
+                GetRadio(i).IsChecked = i == 14;
+            }
+            CbbDominantWind.SelectedIndex = 0;
+            CbbSeatWind.SelectedIndex = 0;
+            GrbResults.Visibility = Visibility.Collapsed;
+            GrbResults.Content = null;
+        }
+
+        private bool ExtractFromForm(out List<TilePivot> tiles, out TilePivot latestPickTile, out WindPivot dominantWind, out WindPivot seatWind)
+        {
+            tiles = new List<TilePivot>();
+            latestPickTile = null;
+            dominantWind = WindPivot.East;
+            seatWind = WindPivot.East;
+
+            for (int i = 1; i <= 14; i++)
+            {
+                if (GetCombo(i).SelectedItem == null)
+                {
+                    MessageBox.Show("Some slots are empty.", "LionelRiichiStats - Error");
+                    return false;
+                }
+                TilePivot tile = GetCombo(i).SelectedItem as TilePivot;
+                if (GetRadio(i).IsChecked == true && latestPickTile == null)
+                {
+                    latestPickTile = tile;
+                }
+                else
+                {
+                    tiles.Add(tile);
+                }
+            }
+            if (latestPickTile == null)
+            {
+                MessageBox.Show("The latest tile has not been selected.", "LionelRiichiStats - Error");
+                return false;
+            }
+            if (CbbDominantWind.SelectedIndex == -1)
+            {
+                MessageBox.Show("The dominant wind has not been selected.", "LionelRiichiStats - Error");
+                return false;
+            }
+            if (CbbSeatWind.SelectedIndex == -1)
+            {
+                MessageBox.Show("The seat wind has not been selected.", "LionelRiichiStats - Error");
+                return false;
+            }
+            dominantWind = (WindPivot)CbbDominantWind.SelectedItem;
+            seatWind = (WindPivot)CbbSeatWind.SelectedItem;
+
+            return true;
         }
     }
 }
