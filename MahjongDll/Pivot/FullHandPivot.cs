@@ -608,6 +608,8 @@ namespace MahjongDll.Pivot
                 sets.AddRange(OpenedSets);
             });
 
+            listOf_FourthSetsAndAPair.RemoveAll(sets => sets.Count != 5);
+
             return listOf_FourthSetsAndAPair.Distinct(new SetListComparerPivot()).ToList();
         }
 

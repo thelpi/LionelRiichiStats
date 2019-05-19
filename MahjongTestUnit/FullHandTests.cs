@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MahjongDll.Pivot;
 using System.Linq;
+using MahjongDll.Pivot;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MahjongTestUnit
 {
@@ -273,7 +273,7 @@ namespace MahjongTestUnit
         }
 
         [TestMethod]
-        public void Test_NotAValidHand()
+        public void Test_NotAValidHand_1()
         {
             List<TilePivot> tiles = new List<TilePivot>
             {
@@ -294,6 +294,35 @@ namespace MahjongTestUnit
             tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
 
             FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North, new TilePivot(FamilyPivot.Character, 1));
+
+            List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
+
+            Assert.IsNotNull(groupsOfYakus);
+            Assert.AreEqual(0, groupsOfYakus.Count);
+        }
+
+        [TestMethod]
+        public void Test_NotAValidHand_2()
+        {
+            List<TilePivot> tiles = new List<TilePivot>
+            {
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 1),
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 2),
+                new TilePivot(FamilyPivot.Character, 3),
+                new TilePivot(FamilyPivot.Character, 3),
+                new TilePivot(FamilyPivot.Circle, 1),
+                new TilePivot(FamilyPivot.Circle, 1),
+                new TilePivot(FamilyPivot.Circle, 2),
+                new TilePivot(FamilyPivot.Circle, 3),
+                new TilePivot(FamilyPivot.Circle, 7),
+                new TilePivot(FamilyPivot.Circle, 8),
+                new TilePivot(DragonPivot.Red)
+            };
+            tiles = tiles.OrderBy(x => _randomizer.Next()).ToList();
+
+            FullHandPivot handPivot = new FullHandPivot(tiles, WindPivot.East, WindPivot.North, new TilePivot(DragonPivot.Red));
 
             List<HandYakuListPivot> groupsOfYakus = handPivot.ComputeHandYakus();
 

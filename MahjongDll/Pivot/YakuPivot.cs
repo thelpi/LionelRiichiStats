@@ -356,7 +356,7 @@ namespace MahjongDll.Pivot
         /// <summary>
         /// Double riichi.
         /// </summary>
-        public const string DoubleRiichi = "Double riichi";
+        public const string DoubleRiichi = "Daburu riichi";
         /// <summary>
         /// Riichi.
         /// </summary>
