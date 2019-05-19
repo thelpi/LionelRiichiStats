@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,45 +47,27 @@ namespace MahjongHandAnalyzer
 
             #region 0 tile
 
-            FullHandPivot hand = new FullHandPivot(handTiles, dominantWind, seatWind, latestTile);
-            HandYakuListPivot handYakus = hand.ComputeHandYakus()?.FirstOrDefault();
+            FullHandPivot hand0 = new FullHandPivot(handTiles, dominantWind, seatWind, latestTile);
+            HandYakuListPivot handYakus = hand0.ComputeHandYakus()?.FirstOrDefault();
             SetContentFromHandListYaku(Tbi0, handYakus);
 
             #endregion 0 tile
 
             #region 1 tile
-
-            // gets yakus for each substitution combination
-            var rawResults = new List<Tuple<TilePivot, TilePivot, HandYakuListPivot>>();
-            var alreadyDone = new List<Tuple<TilePivot, TilePivot>>();
+            
             var handTileWithLast = new List<TilePivot>(handTiles)
             {
                 latestTile
             };
             List<TilePivot> availableTiles = _draw.ComputeRemainingTiles(handTileWithLast, true);
-            foreach (TilePivot subbedTile in handTileWithLast.Distinct())
+
+            // gets yakus for each substitution combination
+            LoadWindow loadWindow = new LoadWindow(BackgroundHandlerForOneTileAway, new object[]
             {
-                foreach (TilePivot subTile in availableTiles)
-                {
-                    if (subbedTile.Equals(subTile)
-                        && !alreadyDone.Any(_ => _.Item1 == subbedTile && _.Item2 == subTile))
-                    {
-                        continue;
-                    }
-                    alreadyDone.Add(new Tuple<TilePivot, TilePivot>(subbedTile, subTile));
-
-                    List<TilePivot> handTilesWithSub = new List<TilePivot>(handTileWithLast);
-                    handTilesWithSub.Remove(subbedTile);
-
-                    hand = new FullHandPivot(handTilesWithSub, dominantWind, seatWind, subTile);
-
-                    HandYakuListPivot tmpResults = hand.ComputeHandYakus()?.FirstOrDefault();
-                    if (tmpResults != null)
-                    {
-                        rawResults.Add(new Tuple<TilePivot, TilePivot, HandYakuListPivot>(subbedTile, subTile, tmpResults));
-                    }
-                }
-            }
+                dominantWind, seatWind, handTileWithLast, availableTiles
+            });
+            loadWindow.ShowDialog();
+            var rawResults = loadWindow.ReturnValue as List<Tuple<TilePivot, TilePivot, HandYakuListPivot>>;
 
             // flats the raw results
             var groupResults = new Dictionary<HandYakuListPivot, List<Tuple<TilePivot, TilePivot>>>();
@@ -159,6 +142,53 @@ namespace MahjongHandAnalyzer
             #endregion 1 tile
 
             GrbResults.Visibility = Visibility.Visible;
+        }
+
+        private static void BackgroundHandlerForOneTileAway(object sender, DoWorkEventArgs e)
+        {
+            object[] arguments = e.Argument as object[];
+            BackgroundWorker bgw = sender as BackgroundWorker;
+
+            WindPivot dominantWind = (WindPivot)arguments[0];
+            WindPivot seatWind = (WindPivot)arguments[1];
+            List<TilePivot> handTileWithLast = arguments[2] as List<TilePivot>;
+            List<TilePivot> availableTiles = arguments[3] as List<TilePivot>;
+
+            var alreadyDone = new List<Tuple<TilePivot, TilePivot>>();
+            var rawResults = new List<Tuple<TilePivot, TilePivot, HandYakuListPivot>>();
+
+            int totalIterations = handTileWithLast.Distinct().Count() * availableTiles.Count;
+            int currentIteration = 0;
+
+            foreach (TilePivot subbedTile in handTileWithLast.Distinct())
+            {
+                foreach (TilePivot subTile in availableTiles)
+                {
+                    currentIteration++;
+                    bgw.ReportProgress(Convert.ToInt32(Math.Round((currentIteration / (double)totalIterations) * 100)));
+
+                    if (subbedTile.Equals(subTile)
+                        && !alreadyDone.Any(_ => _.Item1 == subbedTile && _.Item2 == subTile))
+                    {
+                        continue;
+                    }
+
+                    alreadyDone.Add(new Tuple<TilePivot, TilePivot>(subbedTile, subTile));
+
+                    List<TilePivot> handTilesWithSub = new List<TilePivot>(handTileWithLast);
+                    handTilesWithSub.Remove(subbedTile);
+
+                    var hand1 = new FullHandPivot(handTilesWithSub, dominantWind, seatWind, subTile);
+
+                    HandYakuListPivot tmpResults = hand1.ComputeHandYakus()?.FirstOrDefault();
+                    if (tmpResults != null)
+                    {
+                        rawResults.Add(new Tuple<TilePivot, TilePivot, HandYakuListPivot>(subbedTile, subTile, tmpResults));
+                    }
+                }
+            }
+
+            e.Result = rawResults;
         }
 
         private void BtnRandomize_Click(object sender, RoutedEventArgs e)

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MahjongHandAnalyzer"
+        xmlns:local="clr-namespace:MahjongHandAnalyzer" WindowStartupLocation="CenterScreen"
         mc:Ignorable="d" Background="Gainsboro" Padding="5"
         Title="LionelRiichiStats" SizeToContent="WidthAndHeight">
     <Window.Resources>
@@ -163,9 +163,9 @@
         </GroupBox>
         <GroupBox Header="Results" DockPanel.Dock="Bottom" Padding="5" Name="GrbResults">
             <TabControl>
-                <TabItem Header="0 changes" Name="Tbi0" IsSelected="True" />
-                <TabItem Header="1 changes" Name="Tbi1" />
-                <TabItem Header="2 changes" Name="Tbi2" />
+                <TabItem Header="0 tile away" Name="Tbi0" IsSelected="True" />
+                <TabItem Header="1 tile away" Name="Tbi1" />
+                <TabItem Header="2 tiles away" Name="Tbi2" />
             </TabControl>
         </GroupBox>
     </DockPanel>
