@@ -43,7 +43,7 @@ namespace MahjongHandAnalyzer.Datas
     internal class SubstitutionGroup
     {
         private List<SubstitutionSequence> _substitutionSequences;
-        private bool _noSubAdded;
+        private readonly bool _noSubAdded;
 
         public IReadOnlyCollection<SubstitutionSequence> SubstitutionSequences { get { return _substitutionSequences; } }
         public double Probability { get; private set; }

@@ -257,27 +257,19 @@ namespace MahjongHandAnalyzer
         private static Tuple<List<SubstitutionGroup>, List<Substitution>> BackgroundHandlerForOneTileAway(WindPivot dominantWind, WindPivot seatWind,
             List<TilePivot> handTileWithLast, List<TilePivot> availableTiles, List<TilePivot> forbiddenTiles)
         {
-            var alreadyDone = new List<Substitution>();
+            var substitutionsAttemps = new List<Substitution>();
             var rawResults = new List<SubstitutionGroup>();
 
-            int totalIterations = handTileWithLast.Count * availableTiles.Count;
-            int currentIteration = 0;
-
-            foreach (TilePivot subbedTile in handTileWithLast)
+            foreach (TilePivot subbedTile in handTileWithLast.Distinct())
             {
-                foreach (TilePivot subTile in availableTiles)
+                foreach (TilePivot subTile in availableTiles.Distinct())
                 {
-                    currentIteration++;
-                    //bgw.ReportProgress(Convert.ToInt32(Math.Round((currentIteration / (double)totalIterations) * 100)));
-
-                    if (subbedTile.Equals(subTile)
-                        || alreadyDone.Any(_ => _.Subbed == subbedTile && _.Subber == subTile)
-                        || forbiddenTiles.Contains(subTile))
+                    if (subbedTile.Equals(subTile) || forbiddenTiles.Contains(subTile))
                     {
                         continue;
                     }
 
-                    alreadyDone.Add(new Substitution(subbedTile, subTile, availableTiles));
+                    substitutionsAttemps.Add(new Substitution(subbedTile, subTile, availableTiles));
 
                     List<TilePivot> handTilesWithSub = new List<TilePivot>(handTileWithLast);
                     handTilesWithSub.Remove(subbedTile);
@@ -301,7 +293,7 @@ namespace MahjongHandAnalyzer
                 }
             }
 
-            return new Tuple<List<SubstitutionGroup>, List<Substitution>>(rawResults, alreadyDone);
+            return new Tuple<List<SubstitutionGroup>, List<Substitution>>(rawResults, substitutionsAttemps);
         }
 
         private void BtnRandomize_Click(object sender, RoutedEventArgs e)
