@@ -53,18 +53,16 @@ namespace MahjongHandAnalyzer
             });
             wdw.ShowDialog();
             var resultsAr = wdw.ReturnValue as object[];
-
-            var handYakus = resultsAr[0] as HandYakuListPivot;
-            var orderedRes = resultsAr[1] as Dictionary<HandYakuListPivot, Tuple<double, List<Substitution>>>;
-            var discardprobabilities = resultsAr[2] as Dictionary<TilePivot, double>;
-            var orderedResAway2 = resultsAr[3] as Dictionary<HandYakuListPivot, Tuple<double, List<List<Substitution>>>>;
+            
+            var orderedRes = resultsAr[0] as Dictionary<int, List<SubstitutionGroup>>;
+            var discardprobabilities = resultsAr[1] as Dictionary<TilePivot, double>;
 
             // display tile away0
-            SetContentFromHandListYaku(Tbi0, handYakus);
+            SetContentFromHandListYaku(Tbi0, orderedRes[0].First());
             // display tile away1
-            DisplayTile1Away(orderedRes, discardprobabilities);
+            DisplayTile1Away(orderedRes[1], discardprobabilities);
             // display tile away2
-            DisplayTile2Away(orderedResAway2);
+            DisplayTile2Away(orderedRes[2]);
 
             GrbResults.Visibility = Visibility.Visible;
         }
@@ -78,9 +76,15 @@ namespace MahjongHandAnalyzer
             var latestTile = (TilePivot)arguments[3];
             var draw = (DrawPivot)arguments[4];
 
+            Dictionary<int, List<SubstitutionGroup>> subsGroupByAwayIndex = new Dictionary<int, List<SubstitutionGroup>>();
+
             // compute tile0
             FullHandPivot hand0 = new FullHandPivot(handTiles, dominantWind, seatWind, latestTile);
             HandYakuListPivot handYakus = hand0.ComputeHandYakus()?.FirstOrDefault();
+            subsGroupByAwayIndex.Add(0, new List<SubstitutionGroup>
+            {
+                new SubstitutionGroup(handYakus, true)
+            });
 
             #region 1 tile away
 
@@ -94,50 +98,34 @@ namespace MahjongHandAnalyzer
             var rawResultsArray = BackgroundHandlerForOneTileAway(dominantWind, seatWind, handTileWithLast, availableTiles, new List<TilePivot>());
             var rawResults = rawResultsArray.Item1;
 
-            var groupResults = Flat(rawResults);
-
-            // computes the probability of each HandYakuListPivot
-            var resultsWithProb = new Dictionary<HandYakuListPivot, Tuple<double, List<Substitution>>>();
-            foreach (var key in groupResults.Keys)
-            {
-                double prob = 0;
-                foreach (var arV in groupResults[key])
-                {
-                    prob += (arV.SubSource.Count(_ => _.Equals(arV.Subber)) / (double)arV.SubSource.Count);
-                }
-                resultsWithProb.Add(key, new Tuple<double, List<Substitution>>(prob, groupResults[key]));
-            }
-
-            // displays ordered results
-            var orderedRes = resultsWithProb
-                                .OrderByDescending(x => x.Value.Item1)
-                                .ToDictionary(x => x.Key, x => x.Value);
+            subsGroupByAwayIndex.Add(1, rawResults.OrderByDescending(x => x.Probability).ToList());
 
             // per discard solutions
             var discardprobabilities = new Dictionary<TilePivot, double>();
-            TilePivot currentDiscard = null;
-            double probability = 0;
-            foreach (var r in rawResults.OrderBy(x => x.Item1.Subbed))
-            {
-                if (currentDiscard != null && !r.Item1.Subbed.Equals(currentDiscard))
-                {
-                    discardprobabilities.Add(currentDiscard, Math.Round(probability * 100, 3));
-                    probability = 0;
-                }
-                currentDiscard = r.Item1.Subbed;
-                probability += availableTiles.Count(_ => _.Equals(currentDiscard)) / (double)availableTiles.Count;
-            }
-            if (currentDiscard != null)
-            {
-                discardprobabilities.Add(currentDiscard, Math.Round(probability * 100, 3));
-            }
+            /* 
+             TilePivot currentDiscard = null;
+             double probability = 0;
+             foreach (var r in rawResults.OrderBy(x => x.SubstitutionSequences.First().Substitutions.First().Subbed))
+             {
+                 if (currentDiscard != null && !r.Item1.Subbed.Equals(currentDiscard))
+                 {
+                     discardprobabilities.Add(currentDiscard, Math.Round(probability * 100, 3));
+                     probability = 0;
+                 }
+                 currentDiscard = r.Item1.Subbed;
+                 probability += availableTiles.Count(_ => _.Equals(currentDiscard)) / (double)availableTiles.Count;
+             }
+             if (currentDiscard != null)
+             {
+                 discardprobabilities.Add(currentDiscard, Math.Round(probability * 100, 3));
+             }*/
 
             #endregion 1 tile away
 
             #region 2 tiles away
 
             // gets yakus for each substitution combination
-            var rawResults2Away = new List<Tuple<HandYakuListPivot, List<Substitution>>>();
+            var rawResults2Away = new List<SubstitutionGroup>();
             var firstRoundSubstitutionsList = rawResultsArray.Item2;
             foreach (var firstSubstitution in firstRoundSubstitutionsList)
             {
@@ -150,47 +138,20 @@ namespace MahjongHandAnalyzer
                 usedTiles.Remove(firstSubstitution.Subbed);
 
                 rawResultsArray = BackgroundHandlerForOneTileAway(dominantWind, seatWind, usedTiles, availableTilesAway2, new List<TilePivot> { firstSubstitution.Subbed });
-                var tmpResult = rawResultsArray.Item1;
-                if (tmpResult.Count > 0)
+                foreach (var toto in rawResultsArray.Item1)
                 {
-                    rawResults2Away.AddRange(tmpResult.Select(x =>
-                        new Tuple<HandYakuListPivot, List<Substitution>>(
-                            x.Item2, new List<Substitution>
-                            {
-                                firstSubstitution,
-                                x.Item1
-                            })));
+                    toto.SubstitutionSequences.All(delegate(SubstitutionSequence x) { x.AddSubstitution(firstSubstitution); return true; });
+                    rawResults2Away.Add(toto);
                 }
             }
 
-            var groupResults2Away = Flat2(rawResults2Away);
-
-            // computes the probability of each HandYakuListPivot
-            var resultsWithProbAway2 = new Dictionary<HandYakuListPivot, Tuple<double, List<List<Substitution>>>>();
-            foreach (var key in groupResults2Away.Keys)
-            {
-                double prob = 0;
-                foreach (var arV in groupResults2Away[key])
-                {
-                    int probT1 = arV[0].SubSource.Count(_ => _.Equals(arV[0].Subber));
-                    int probT2 = arV[1].SubSource.Count(_ => _.Equals(arV[1].Subber));
-                    prob += (probT1 / (double)arV[0].SubSource.Count) * (probT2 / (double)arV[1].SubSource.Count);
-                }
-                resultsWithProbAway2.Add(key, new Tuple<double, List<List<Substitution>>>(
-                    prob, groupResults2Away[key]));
-            }
-
-            // ordered results by probability
-            var orderedResAway2 = resultsWithProbAway2
-                                .OrderByDescending(x => x.Value.Item1)
-                                .ToDictionary(x => x.Key, x => x.Value);
-
+            subsGroupByAwayIndex.Add(2, rawResults2Away.OrderByDescending(x => x.Probability).ToList());
 
             #endregion 2 tiles away
 
             e.Result = new object[]
             {
-                handYakus, orderedRes, discardprobabilities, orderedResAway2
+                subsGroupByAwayIndex, discardprobabilities
             };
         }
 
@@ -232,16 +193,16 @@ namespace MahjongHandAnalyzer
             return groupResults;
         }
 
-        private void DisplayTile2Away(Dictionary<HandYakuListPivot, Tuple<double, List<List<Substitution>>>> orderedResAway2)
+        private void DisplayTile2Away(List<SubstitutionGroup> orderedResAway2)
         {
             int i = 0;
             StackPanel spSolutionsAway2 = new StackPanel { Orientation = Orientation.Horizontal };
             spSolutionsAway2.SetValue(DockPanel.DockProperty, Dock.Top);
-            foreach (var key in orderedResAway2.Keys)
+            foreach (var group in orderedResAway2)
             {
                 i++;
                 GroupBox gbSingle = new GroupBox { Header = $"Solution {i}" };
-                SetContentFromHandListYaku(gbSingle, key, orderedResAway2[key].Item1, orderedResAway2[key].Item2.Select(x => x));
+                SetContentFromHandListYaku(gbSingle, group);
                 spSolutionsAway2.Children.Add(gbSingle);
             }
 
@@ -259,18 +220,17 @@ namespace MahjongHandAnalyzer
             Tbi2.Content = fullResultsAway2;
         }
 
-        private void DisplayTile1Away(Dictionary<HandYakuListPivot, Tuple<double, List<Substitution>>> orderedRes,
+        private void DisplayTile1Away(List<SubstitutionGroup> orderedRes,
             Dictionary<TilePivot, double>  discardprobabilities)
         {
             int j = 0;
             StackPanel spSolutions = new StackPanel { Orientation = Orientation.Horizontal };
             spSolutions.SetValue(DockPanel.DockProperty, Dock.Top);
-            foreach (var key in orderedRes.Keys)
+            foreach (var subGroup in orderedRes)
             {
                 j++;
                 GroupBox gbSingle = new GroupBox { Header = $"Solution {j}" };
-                SetContentFromHandListYaku(gbSingle, key, orderedRes[key].Item1,
-                    orderedRes[key].Item2.Select(x => new List<Substitution> { x }));
+                SetContentFromHandListYaku(gbSingle, subGroup);
                 spSolutions.Children.Add(gbSingle);
             }
 
@@ -294,11 +254,11 @@ namespace MahjongHandAnalyzer
             Tbi1.Content = fullResults;
         }
 
-        private static Tuple<List<Tuple<Substitution, HandYakuListPivot>>, List<Substitution>> BackgroundHandlerForOneTileAway(WindPivot dominantWind, WindPivot seatWind,
+        private static Tuple<List<SubstitutionGroup>, List<Substitution>> BackgroundHandlerForOneTileAway(WindPivot dominantWind, WindPivot seatWind,
             List<TilePivot> handTileWithLast, List<TilePivot> availableTiles, List<TilePivot> forbiddenTiles)
         {
             var alreadyDone = new List<Substitution>();
-            var rawResults = new List<Tuple<Substitution, HandYakuListPivot>>();
+            var rawResults = new List<SubstitutionGroup>();
 
             int totalIterations = handTileWithLast.Count * availableTiles.Count;
             int currentIteration = 0;
@@ -327,12 +287,21 @@ namespace MahjongHandAnalyzer
                     HandYakuListPivot tmpResults = hand1.ComputeHandYakus()?.FirstOrDefault();
                     if (tmpResults != null)
                     {
-                        rawResults.Add(new Tuple<Substitution, HandYakuListPivot>(new Substitution(subbedTile, subTile, availableTiles), tmpResults));
+                        var subSeq = new SubstitutionSequence();
+                        subSeq.AddSubstitution(new Substitution(subbedTile, subTile, availableTiles));
+
+                        var finded = rawResults.FirstOrDefault(x => x.Yakus.Equals(tmpResults));
+                        if (finded == null)
+                        {
+                            rawResults.Add(new SubstitutionGroup(tmpResults));
+                            finded = rawResults.Last();
+                        }
+                        finded.AddSubstitutionSequence(subSeq);
                     }
                 }
             }
 
-            return new Tuple<List<Tuple<Substitution, HandYakuListPivot>>, List<Substitution>>(rawResults, alreadyDone);
+            return new Tuple<List<SubstitutionGroup>, List<Substitution>>(rawResults, alreadyDone);
         }
 
         private void BtnRandomize_Click(object sender, RoutedEventArgs e)
@@ -431,10 +400,9 @@ namespace MahjongHandAnalyzer
             return true;
         }
 
-        private void SetContentFromHandListYaku(ContentControl container, HandYakuListPivot handYakus, double probability = 1,
-            IEnumerable<IEnumerable<Substitution>> substitutions = null)
+        private void SetContentFromHandListYaku(ContentControl container, SubstitutionGroup subGroup)
         {
-            if (handYakus == null)
+            if (subGroup?.Yakus == null)
             {
                 container.Content = new TextBlock
                 {
@@ -450,22 +418,22 @@ namespace MahjongHandAnalyzer
                 };
                 sp.Children.Add(new TextBlock
                 {
-                    Text = handYakus.FansName,
+                    Text = subGroup.Yakus.FansName,
                     FontSize = 12,
                     Foreground = System.Windows.Media.Brushes.Red
                 });
-                if (probability < 1)
+                if (subGroup.Probability < 1)
                 {
                     sp.Children.Add(new TextBlock
                     {
-                        Text = $"Prob. of {Math.Round(probability * 100, 3)} %",
+                        Text = $"Prob. of {Math.Round(subGroup.Probability * 100, 3)} %",
                         FontSize = 12,
                         Foreground = System.Windows.Media.Brushes.DarkSlateBlue
                     });
                 }
 
                 StackPanel spYakus = new StackPanel { Orientation = Orientation.Vertical };
-                foreach (YakuPivot yaku in handYakus.Yakus)
+                foreach (YakuPivot yaku in subGroup.Yakus.Yakus)
                 {
                     spYakus.Children.Add(new TextBlock
                     {
@@ -477,14 +445,14 @@ namespace MahjongHandAnalyzer
                 GroupBox gbYakus = new GroupBox { Header = "Yakus", Content = spYakus };
                 sp.Children.Add(gbYakus);
 
-                if (substitutions != null)
+                if (subGroup.SubstitutionSequences.Any())
                 {
                     StackPanel spSubs = new StackPanel { Orientation = Orientation.Vertical };
-                    foreach (var sub in substitutions)
+                    foreach (var sub in subGroup.SubstitutionSequences)
                     {
                         spSubs.Children.Add(new TextBlock
                         {
-                            Text = string.Join(", then ", sub.Select(x => $"discard/pick {x.Subbed}/{x.Subber}").ToArray())
+                            Text = string.Join(", then ", sub.Substitutions.Select(x => $"discard/pick {x.Subbed}/{x.Subber}").ToArray())
                         });
                     }
 
