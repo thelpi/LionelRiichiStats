@@ -513,104 +513,89 @@ namespace MahjongDll.Pivot
         // Computes the list of valid combinations for this hand (regardless of concealed or not). Doesn't include Kokushi Musou and Chiitoiitsu.
         private List<List<SetPivot>> ComputeValidCombinations()
         {
-            List<List<SetPivot>> listOf_FourthSetsAndAPair = new List<List<SetPivot>>();
-            bool failAnyway = false;
-
-            // Treats each family of tiles (dragon, wind, bamboo...) and begins with dragons and winds (do not change the OrderBy).
-            foreach (var family in UnsetTiles.GroupBy(t => t.Family).OrderByDescending(t => (int)t.Key))
+            // family of tiles with a bad count (1, 4, 7, 11)
+            if (UnsetTiles.GroupBy(t => new { t.Family, t.Wind, t.Dragon }).Any(tkey => _forbiddenCounts.Contains(tkey.Count())))
             {
-                switch (family.Key)
+                return new List<List<SetPivot>>();
+            }
+
+            // no potential pair or more than one in dragon/wind
+            if (!UnsetTiles.GroupBy(t => t).Any(tkey => tkey.Count() == 2)
+                || UnsetTiles.Where(t => t.IsHonor).GroupBy(t => new { t.Wind, t.Dragon }).Count(tkey => tkey.Count() == 2) > 1)
+            {
+                return new List<List<SetPivot>>();
+            }
+
+            // no isolated tile (honors already checked at this point)
+            if (UnsetTiles.Any(t => !t.IsHonor && !UnsetTiles.Any(t2 =>
+                (t2.Equals(t) && !Equals(t, t2))
+                    || (t2.Family == t.Family && (t2.Number == t.Number - 1 || t2.Number == t.Number + 1))
+            )))
+            {
+                return new List<List<SetPivot>>();
+            }
+
+            List<List<SetPivot>> potentialHandsSets = new List<List<SetPivot>>
+            {
+                UnsetTiles
+                    .Where(t => t.IsHonor)
+                    .GroupBy(t => new { t.Wind, t.Dragon })
+                    .Select(x => new SetPivot(x.ToArray()))
+                    .ToList()
+            };
+
+            // Treats each family of tiles (dragon, wind, bamboo)
+            foreach (var family in UnsetTiles.Where(t => !t.IsHonor).GroupBy(t => t.Family))
+            {
+                // Make sure to keep the OrderBy !
+                List<TilePivot> baseTilesOfFamily = family.OrderBy(t => t).ToList();
+
+                // If we already have partial sets list and the current family contains a pair.
+                if (potentialHandsSets.Count > 0 && _withPairCounts.Contains(baseTilesOfFamily.Count))
                 {
-                    case FamilyPivot.Dragon:
-                        List<SetPivot> setsOfDragons = new List<SetPivot>();
-                        foreach (var dragon in family.GroupBy(t => t.Dragon.Value))
-                        {
-                            if (!TryExtractSetsFromWindOrDragonFamily(setsOfDragons, dragon.ToList()))
-                            {
-                                failAnyway = true;
-                                goto exitloop;
-                            }
-                        }
-                        AddWindOrDragonSetsToListOfSetsList(listOf_FourthSetsAndAPair, setsOfDragons);
-                        break;
-                    case FamilyPivot.Wind:
-                        List<SetPivot> setsOfWinds = new List<SetPivot>();
-                        foreach (var wind in family.GroupBy(t => t.Wind.Value))
-                        {
-                            if (!TryExtractSetsFromWindOrDragonFamily(setsOfWinds, wind.ToList()))
-                            {
-                                failAnyway = true;
-                                goto exitloop;
-                            }
-                        }
-                        AddWindOrDragonSetsToListOfSetsList(listOf_FourthSetsAndAPair, setsOfWinds);
-                        break;
-                    default:
-                        if (_forbiddenCounts.Contains(family.Count()))
-                        {
-                            failAnyway = true;
-                            goto exitloop;
-                        }
-
-                        // Make sure to keep the OrderBy !
-                        List<TilePivot> baseTilesOfFamily = family.OrderBy(t => t).ToList();
-
-                        // If we already have partial sets list and the current family contains a pair.
-                        if (listOf_FourthSetsAndAPair.Count > 0 && _withPairCounts.Contains(baseTilesOfFamily.Count))
-                        {
-                            // We need to remove all the sets list which already contains a pair.
-                            listOf_FourthSetsAndAPair.RemoveAll(tsl => tsl.Any(tl => tl.IsPair));
-                            // If, by doing so, we remove all the sets list, then we have to stop completely.
-                            if (listOf_FourthSetsAndAPair.Count == 0)
-                            {
-                                failAnyway = true;
-                                goto exitloop;
-                            }
-                        }
-
-                        // Computes every possible sets for each tile (but no reverse loop on tiles already processed).
-                        List<List<List<int>>> setsForEachTile = new List<List<List<int>>>();
-                        for (int i = 0; i < baseTilesOfFamily.Count - 1; i++)
-                        {
-                            List<List<int>> possibleSetsForAtile = GetPossibleSetsForATile(baseTilesOfFamily, i);
-                            if (possibleSetsForAtile.Count > 0)
-                            {
-                                setsForEachTile.Add(possibleSetsForAtile);
-                            }
-                        }
-
-                        if (setsForEachTile.Count == 0)
-                        {
-                            failAnyway = true;
-                            goto exitloop;
-                        }
-
-                        List<List<List<int>>> listOfPossibleSetIndexes = FilterPossibleSetsCombinationFromBaseSetsList(baseTilesOfFamily, setsForEachTile);
-
-                        AddCartesianListOfSetsToListOfSetsList(ref listOf_FourthSetsAndAPair,
-                            listOfPossibleSetIndexes
-                                .Select(indexList => FromListIndexToSetList(indexList, baseTilesOfFamily))
-                                .ToList());
-
-                        break;
+                    // We need to remove all the sets list which already contains a pair.
+                    potentialHandsSets.RemoveAll(tsl => tsl.Any(tl => tl.IsPair));
+                    // If, by doing so, we remove all the sets list, then we have to stop completely.
+                    if (potentialHandsSets.Count == 0)
+                    {
+                        // forced exit
+                        return new List<List<SetPivot>>();
+                    }
                 }
-            }
-            exitloop:
 
-            if (failAnyway)
-            {
-                listOf_FourthSetsAndAPair.Clear();
+                // Computes every possible sets for each tile (but no reverse loop on tiles already processed).
+                List<List<List<int>>> setsForEachTile = new List<List<List<int>>>();
+                for (int i = 0; i < baseTilesOfFamily.Count - 1; i++)
+                {
+                    List<List<int>> possibleSetsForAtile = GetPossibleSetsForATile(baseTilesOfFamily, i);
+                    if (possibleSetsForAtile.Count > 0)
+                    {
+                        setsForEachTile.Add(possibleSetsForAtile);
+                    }
+                }
+
+                if (setsForEachTile.Count == 0)
+                {
+                    return new List<List<SetPivot>>();
+                }
+
+                List<List<List<int>>> listOfPossibleSetIndexes = FilterPossibleSetsCombinationFromBaseSetsList(baseTilesOfFamily, setsForEachTile);
+
+                AddCartesianListOfSetsToListOfSetsList(ref potentialHandsSets,
+                    listOfPossibleSetIndexes
+                        .Select(indexList => FromListIndexToSetList(indexList, baseTilesOfFamily))
+                        .ToList());
             }
 
-            listOf_FourthSetsAndAPair.ForEach(sets =>
+            potentialHandsSets.ForEach(sets =>
             {
                 sets.AddRange(ConcealedKans);
                 sets.AddRange(OpenedSets);
             });
 
-            listOf_FourthSetsAndAPair.RemoveAll(sets => sets.Count != 5);
+            potentialHandsSets.RemoveAll(sets => sets.Count != 5);
 
-            return listOf_FourthSetsAndAPair.Distinct(new SetListComparerPivot()).ToList();
+            return potentialHandsSets.Distinct(new SetListComparerPivot()).ToList();
         }
 
         #endregion Hands validation
@@ -777,11 +762,6 @@ namespace MahjongDll.Pivot
         // Tries to extract each set from the lsit of tiles and adds it to the sets list if success.
         private static bool TryExtractSetsFromWindOrDragonFamily(List<SetPivot> setsList, List<TilePivot> tilesList)
         {
-            if (_forbiddenCounts.Contains(tilesList.Count))
-            {
-                return false;
-            }
-            
             if (_withPairCounts.Contains(tilesList.Count))
             {
                 // Extracts pair, then removes both tiles from the list.
