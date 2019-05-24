@@ -156,9 +156,10 @@
         </GroupBox>
         <GroupBox Header="Actions" DockPanel.Dock="Bottom" Padding="5">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                <Button Height="25" Name="BtnRandomize" Content="Randomize" Width="75" Click="BtnRandomize_Click" Margin="0,0,0,2" VerticalAlignment="Bottom" ToolTip="Fills the form with random values." />
-                <Button Height="25" Name="BtnClear" Content="Clear" Width="75" Click="BtnClear_Click" Margin="10, 0, 0, 0" ToolTip="Initializes the form to default values." />
-                <Button Margin="10, 0, 0, 0" Height="25" Name="BtnAnalyze" Content="Analyze" Width="75" Click="BtnAnalyze_Click" ToolTip="Proceeds to analyse the form with current values." />
+                <Button Height="25" Name="BtnRandomize" Content="Randomize" Width="75" Click="BtnRandomize_Click" Margin="0,0,0,2" ToolTip="Fills the form with random values." />
+                <Button Height="25" Name="BtnClear" Content="Clear" Width="75" Click="BtnClear_Click" Margin="10, 0, 0, 0" ToolTip="Initializes the form to its default state." />
+                <Button Height="25" Name="BtnAnalyze" Content="Analyze" Width="75" Click="BtnAnalyze_Click" Margin="10, 0, 0, 0"  ToolTip="Analyses the form in its current state." />
+                <Button Height="25" Name="BtnFillKokushiIichanten" Content="KM" Width="25"  Click="BtnFillKokushiIichanten_Click" Margin="10, 0, 0, 0" ToolTip="Fills the form with an iichanten kokushi musou" />
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Results" DockPanel.Dock="Bottom" Padding="5" Name="GrbResults">

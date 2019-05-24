@@ -83,7 +83,7 @@ namespace MahjongHandAnalyzer
             HandYakuListPivot handYakus = hand0.ComputeHandYakus()?.FirstOrDefault();
             subsGroupByAwayIndex.Add(0, new List<SubstitutionGroup>
             {
-                new SubstitutionGroup(handYakus, true)
+                new SubstitutionGroup(handYakus)
             });
 
             #region 1 tile away
@@ -138,14 +138,32 @@ namespace MahjongHandAnalyzer
                 usedTiles.Remove(firstSubstitution.Subbed);
 
                 rawResultsArray = BackgroundHandlerForOneTileAway(dominantWind, seatWind, usedTiles, availableTilesAway2, new List<TilePivot> { firstSubstitution.Subbed });
-                foreach (var toto in rawResultsArray.Item1)
+                var subGroupList = rawResultsArray.Item1;
+                foreach (var subGroup in rawResultsArray.Item1)
                 {
-                    toto.SubstitutionSequences.All(delegate(SubstitutionSequence x) { x.AddSubstitution(firstSubstitution); return true; });
-                    rawResults2Away.Add(toto);
+                    subGroup.AddSubstitutionToEachSequences(firstSubstitution);
+                    rawResults2Away.Add(subGroup);
                 }
             }
 
-            subsGroupByAwayIndex.Add(2, rawResults2Away.OrderByDescending(x => x.Probability).ToList());
+            var resultsAway2WithoutDuplicates = new List<SubstitutionGroup>();
+            foreach (var r in rawResults2Away)
+            {
+                var match = resultsAway2WithoutDuplicates.FirstOrDefault(ra => ra.Yakus.Equals(r.Yakus));
+                if (match == null)
+                {
+                    resultsAway2WithoutDuplicates.Add(r);
+                }
+                else
+                {
+                    foreach (var seq in r.SubstitutionSequences)
+                    {
+                        match.AddSubstitutionSequence(seq);
+                    }
+                }
+            }
+
+            subsGroupByAwayIndex.Add(2, resultsAway2WithoutDuplicates.OrderByDescending(x => x.Probability).ToList());
 
             #endregion 2 tiles away
 
@@ -453,6 +471,58 @@ namespace MahjongHandAnalyzer
                 }
 
                 container.Content = sp;
+            }
+        }
+
+        private void BtnFillKokushiIichanten_Click(object sender, RoutedEventArgs e)
+        {
+            for (int i = 1; i <= 14; i++)
+            {
+                switch (i)
+                {
+                    case 1:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Character && t.Number == 1);
+                        break;
+                    case 2:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Character && t.Number == 9);
+                        break;
+                    case 3:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Circle && t.Number == 1);
+                        break;
+                    case 4:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Circle && t.Number == 9);
+                        break;
+                    case 5:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Bamboo && t.Number == 1);
+                        break;
+                    case 6:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Bamboo && t.Number == 9);
+                        break;
+                    case 7:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Dragon && t.Dragon == DragonPivot.Green);
+                        break;
+                    case 8:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Dragon && t.Dragon == DragonPivot.Red);
+                        break;
+                    case 9:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Dragon && t.Dragon == DragonPivot.White);
+                        break;
+                    case 10:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Wind && t.Wind == WindPivot.East);
+                        break;
+                    case 11:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Wind && t.Wind == WindPivot.West);
+                        break;
+                    case 12:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Wind && t.Wind == WindPivot.South);
+                        break;
+                    case 13:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Character && t.Number == 4);
+                        break;
+                    case 14:
+                        GetCombo(i).SelectedItem = _draw.Tiles.First(t => t.Family == FamilyPivot.Character && t.Number == 7);
+                        break;
+                }
             }
         }
     }

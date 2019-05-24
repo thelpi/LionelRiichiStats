@@ -16,7 +16,12 @@ namespace MahjongHandAnalyzer.Datas
             Subbed = subbed;
             Subber = subber;
             SubSource = subSource.ToList();
-            Probability = 1 / (double)SubSource.Count; // Si distinct : SubSource.Count(t => t.Equals(Subber))
+            Probability = SubSource.Count(t => t.Equals(Subber)) / (double)SubSource.Count;
+        }
+
+        public override string ToString()
+        {
+            return $"[ {Subbed} / {Subber} ]";
         }
     }
 
@@ -38,34 +43,52 @@ namespace MahjongHandAnalyzer.Datas
             _substitutions.Add(substitution);
             Probability *= substitution.Probability;
         }
+
+        public override string ToString()
+        {
+            return $"( {string.Join(" ; ", Substitutions)} )";
+        }
     }
 
     internal class SubstitutionGroup
     {
         private List<SubstitutionSequence> _substitutionSequences;
-        private readonly bool _noSubAdded;
 
         public IReadOnlyCollection<SubstitutionSequence> SubstitutionSequences { get { return _substitutionSequences; } }
-        public double Probability { get; private set; }
         public HandYakuListPivot Yakus { get; private set; }
+        public double Probability
+        {
+            get
+            {
+                return _substitutionSequences.Count == 0 ? 1 :
+                    _substitutionSequences.Sum(subSeq => subSeq.Probability) / _substitutionSequences.First().Substitutions.Count;
+            }
+        }
 
-        internal SubstitutionGroup(HandYakuListPivot handYakuListPivot, bool noSubAdded = false)
+        internal SubstitutionGroup(HandYakuListPivot handYakuListPivot)
         {
             _substitutionSequences = new List<SubstitutionSequence>();
             Yakus = handYakuListPivot;
-            Probability = noSubAdded ? 1 : 0;
-            _noSubAdded = noSubAdded;
         }
 
         internal void AddSubstitutionSequence(SubstitutionSequence substitutionSequence)
         {
-            if (_noSubAdded)
+            if (_substitutionSequences.Any(subSeq => subSeq.Substitutions.Count != substitutionSequence.Substitutions.Count))
             {
-                throw new System.InvalidOperationException("No 'SubstitutionSequence' can't be added in this context.");
+                throw new System.InvalidOperationException("Every sequence should have the same number of substitutions.");
             }
 
             _substitutionSequences.Add(substitutionSequence);
-            Probability += substitutionSequence.Probability;
+        }
+
+        internal void AddSubstitutionToEachSequences(Substitution substitution)
+        {
+            _substitutionSequences.ForEach(substitutionSequence => substitutionSequence.AddSubstitution(substitution));
+        }
+
+        public override string ToString()
+        {
+            return string.Join(" | ", SubstitutionSequences);
         }
     }
 }
